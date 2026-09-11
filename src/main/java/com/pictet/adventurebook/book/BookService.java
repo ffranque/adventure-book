@@ -89,7 +89,6 @@ public class BookService {
         );
     }
 
-    // BookService.java
     private BookDetailResponse toBookDetailResponse(Book book) {
         return new BookDetailResponse(
                 book.getId(),
