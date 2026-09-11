@@ -18,8 +18,6 @@ import java.util.stream.IntStream;
 @Service
 public class AdventureService {
 
-    private static final int MAX_HEALTH = 10;
-    private static final int MIN_HEALTH = 0;
     private final BookRepository bookRepository;
 
     private static final Map<ConsequenceType, IntBinaryOperator> CONSEQUENCE_HANDLERS = Map.of(
@@ -60,7 +58,7 @@ public class AdventureService {
             consequenceText = chosenOption.consequence().text();
         }
 
-        boolean dead = newHealth <= MIN_HEALTH;
+        boolean dead = newHealth <= HealthRules.MIN_HEALTH;
         boolean gameOver = dead || nextSection.type() == SectionType.END;
 
         return new PlayResultResponse(toSectionResponse(nextSection), newHealth, consequenceText, dead, gameOver);
@@ -109,7 +107,7 @@ public class AdventureService {
     }
 
     private int clampHealth(int health) {
-        return Math.max(MIN_HEALTH, Math.min(MAX_HEALTH, health));
+        return Math.max(HealthRules.MIN_HEALTH, Math.min(HealthRules.MAX_HEALTH, health));
         //Math.clamp(health, 0, 10);
     }
 }

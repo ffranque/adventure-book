@@ -1,8 +1,10 @@
 package com.pictet.adventurebook.common.exception;
 
+import com.pictet.adventurebook.common.exception.adventure.AdventureAlreadyFinishedException;
 import com.pictet.adventurebook.common.exception.adventure.InvalidOptionException;
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import com.pictet.adventurebook.common.exception.player.PlayerProgressNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -42,8 +44,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e.getMessage()));
     }
 
-    // Objective 6 adds: @ExceptionHandler(InvalidBookException.class) -> 400 with violations in `details`
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
         List<String> details = e.getBindingResult().getFieldErrors().stream()
@@ -59,5 +59,17 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception", e);
         return ResponseEntity.internalServerError()
                 .body(ErrorResponse.of("An unexpected error occurred"));
+    }
+
+    @ExceptionHandler(PlayerProgressNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePlayerProgressNotFound(PlayerProgressNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    @ExceptionHandler(AdventureAlreadyFinishedException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyFinished(AdventureAlreadyFinishedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(e.getMessage()));
     }
 }
