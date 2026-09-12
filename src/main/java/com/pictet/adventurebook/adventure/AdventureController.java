@@ -18,7 +18,7 @@ public class AdventureController {
 
     @GetMapping("/begin")
     public SectionResponse begin(@PathVariable String bookId) {
-        return adventureService.getBeginning(bookId);
+        return adventureService.begin(bookId);
     }
 
     @GetMapping("/{sectionId}")
@@ -29,11 +29,8 @@ public class AdventureController {
     @PostMapping("/{sectionId}/choose")
     public PlayResultResponse choose(@PathVariable String bookId,
                                      @PathVariable int sectionId,
-                                     @Valid @RequestBody ChooseOptionRequest chooseOptionRequest) {
-        return adventureService.choose(
-                bookId,
-                sectionId,
-                chooseOptionRequest.optionIndex(),
-                chooseOptionRequest.currentHealth());
+                                     @Valid @RequestBody ChooseOptionRequest request) {
+
+        return adventureService.choose(bookId, sectionId, request.optionIndex(), request.currentHealth());
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -44,23 +45,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e.getMessage()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
-        List<String> details = e.getBindingResult().getFieldErrors().stream()
-                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-                .toList();
-
-        return ResponseEntity.badRequest()
-                .body(ErrorResponse.of("Validation failed", details));
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpected(Exception e) {
-        log.error("Unhandled exception", e);
-        return ResponseEntity.internalServerError()
-                .body(ErrorResponse.of("An unexpected error occurred"));
-    }
-
     @ExceptionHandler(PlayerProgressNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePlayerProgressNotFound(PlayerProgressNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -71,5 +55,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAlreadyFinished(AdventureAlreadyFinishedException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
+        List<String> details = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .toList();
+
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.of("Validation failed", details));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentTypeMismatchException e) {
+        return  ResponseEntity.badRequest()
+                .body(ErrorResponse.of("SectionId must be a number"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception e) {
+        log.error("Unhandled exception", e);
+        return ResponseEntity.internalServerError()
+                .body(ErrorResponse.of("An unexpected error occurred"));
     }
 }

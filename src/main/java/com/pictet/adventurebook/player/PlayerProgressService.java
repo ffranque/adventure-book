@@ -25,7 +25,7 @@ public class PlayerProgressService {
     }
 
     public PlayResultResponse start(String playerId, String bookId) {
-        SectionResponse beginSection = adventureService.getBeginning(bookId);
+        SectionResponse beginSection = adventureService.begin(bookId);
 
         Optional<PlayerProgress> existingPlayer = playerProgressRepository.findByPlayerIdAndBookId(playerId, bookId);
         if (existingPlayer.isPresent() && existingPlayer.get().getStatus() == ProgressStatus.IN_PROGRESS) {

@@ -29,7 +29,7 @@ public class AdventureService {
         this.bookRepository = bookRepository;
     }
 
-    public SectionResponse getBeginning(String bookId) {
+    public SectionResponse begin(String bookId) {
         Book book = findBookOrThrow(bookId);
         return toSectionResponse(findBeginSection(book));
     }
@@ -107,7 +107,6 @@ public class AdventureService {
     }
 
     private int clampHealth(int health) {
-        return Math.max(HealthRules.MIN_HEALTH, Math.min(HealthRules.MAX_HEALTH, health));
-        //Math.clamp(health, 0, 10);
+        return Math.clamp(health, HealthRules.MIN_HEALTH, HealthRules.MAX_HEALTH);
     }
 }

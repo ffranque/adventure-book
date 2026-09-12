@@ -9,3 +9,8 @@ spring:
   h2:
     console:
       enabled: true
+
+#temporary, for verification only
+logging:
+  level:
+    org.hibernate.SQL: debug
