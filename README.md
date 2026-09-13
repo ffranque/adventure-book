@@ -131,9 +131,6 @@ curl -X POST "localhost:8080/api/v1/books/{id}/sections/{sectionId}/choose" \
 curl -X POST "localhost:8080/api/v1/players/alice/books/{bookId}/start"
 # health 10, at the BEGIN section — persisted to H2
 
-curl -X POST "localhost:8080/api/v1/players/alice/books/{bookId}/start"
-# call again immediately — identical response, does NOT reset an active run
-
 curl -X POST "localhost:8080/api/v1/players/alice/books/{bookId}/choose" \
   -H "Content-Type: application/json" -d '{"optionIndex": 0}'
 # no currentHealth in the request — the server already knows it from the DB
