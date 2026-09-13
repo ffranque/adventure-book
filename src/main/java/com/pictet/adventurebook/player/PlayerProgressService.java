@@ -6,6 +6,7 @@ import com.pictet.adventurebook.adventure.dto.SectionResponse;
 import com.pictet.adventurebook.common.exception.adventure.AdventureAlreadyFinishedException;
 import com.pictet.adventurebook.common.exception.player.PlayerProgressNotFoundException;
 import com.pictet.adventurebook.domain.HealthRules;
+import com.pictet.adventurebook.domain.PlayerProgress;
 import com.pictet.adventurebook.domain.ProgressStatus;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +29,12 @@ public class PlayerProgressService {
         SectionResponse beginSection = adventureService.begin(bookId);
 
         Optional<PlayerProgress> existingPlayer = playerProgressRepository.findByPlayerIdAndBookId(playerId, bookId);
-        if (existingPlayer.isPresent() && existingPlayer.get().getStatus() == ProgressStatus.IN_PROGRESS) {
+        if (existingPlayer.isPresent() && existingPlayer.get().status() == ProgressStatus.IN_PROGRESS) {
             return toPlayResultResponse(existingPlayer.get());
         }
 
-        PlayerProgress progress = existingPlayer.orElseGet(() ->
-                new PlayerProgress(playerId, bookId, beginSection.id(), HealthRules.MAX_HEALTH, ProgressStatus.IN_PROGRESS));
-        progress.setCurrentSectionId(beginSection.id());
-        progress.setHealth(HealthRules.MAX_HEALTH);
-        progress.setStatus(ProgressStatus.IN_PROGRESS);
+        PlayerProgress progress = new PlayerProgress(
+                playerId, bookId, beginSection.id(), HealthRules.MAX_HEALTH, ProgressStatus.IN_PROGRESS);
         playerProgressRepository.save(progress);
 
         return new PlayResultResponse(beginSection, HealthRules.MAX_HEALTH, null, false, false);
@@ -44,17 +42,16 @@ public class PlayerProgressService {
 
     public PlayResultResponse choose(String playerId, String bookId, int optionIndex) {
         PlayerProgress progress = findOrThrow(playerId, bookId);
-        if (progress.getStatus() != ProgressStatus.IN_PROGRESS) {
-            throw new AdventureAlreadyFinishedException(playerId, bookId, progress.getStatus());
+        if (progress.status() != ProgressStatus.IN_PROGRESS) {
+            throw new AdventureAlreadyFinishedException(playerId, bookId, progress.status());
         }
 
         PlayResultResponse playResult = adventureService.choose(
-                bookId, progress.getCurrentSectionId(), optionIndex, progress.getHealth());
+                bookId, progress.currentSectionId(), optionIndex, progress.health());
 
-        progress.setCurrentSectionId(playResult.section().id());
-        progress.setHealth(playResult.health());
-        progress.setStatus(deriveStatus(playResult));
-        playerProgressRepository.save(progress);
+        PlayerProgress updatedProgress = new PlayerProgress(playerId, bookId,
+                playResult.section().id(), playResult.health(), deriveStatus(playResult));
+        playerProgressRepository.save(updatedProgress);
 
         return playResult;
     }
@@ -65,10 +62,11 @@ public class PlayerProgressService {
     }
 
     private PlayResultResponse toPlayResultResponse(PlayerProgress progress) {
-        SectionResponse section = adventureService.getSection(progress.getBookId(), progress.getCurrentSectionId());
-        boolean dead = progress.getStatus() == ProgressStatus.DEAD;
-        boolean gameOver = progress.getStatus() != ProgressStatus.IN_PROGRESS;
-        return new PlayResultResponse(section, progress.getHealth(), null, dead, gameOver);
+        SectionResponse section = adventureService.getSection(progress.bookId(), progress.currentSectionId());
+        boolean dead = progress.status() == ProgressStatus.DEAD;
+        boolean gameOver = progress.status() != ProgressStatus.IN_PROGRESS;
+
+        return new PlayResultResponse(section, progress.health(), null, dead, gameOver);
     }
 
     private ProgressStatus deriveStatus(PlayResultResponse playResult) {
