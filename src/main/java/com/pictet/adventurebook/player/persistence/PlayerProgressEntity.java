@@ -1,4 +1,4 @@
-package com.pictet.adventurebook.player;
+package com.pictet.adventurebook.player.persistence;
 
 import com.pictet.adventurebook.domain.ProgressStatus;
 import jakarta.persistence.*;
@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "player_progress",
         uniqueConstraints = @UniqueConstraint(columnNames = {"playerId", "bookId"}))
-public class PlayerProgress {
+public class PlayerProgressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +28,10 @@ public class PlayerProgress {
     @Column(nullable = false)
     private ProgressStatus status;
 
-    protected PlayerProgress() {
+    protected PlayerProgressEntity() {
     }
 
-    public PlayerProgress(String playerId, String bookId, int currentSectionId, int health, ProgressStatus status) {
+    PlayerProgressEntity(String playerId, String bookId, int currentSectionId, int health, ProgressStatus status) {
         this.playerId = playerId;
         this.bookId = bookId;
         this.currentSectionId = currentSectionId;
@@ -63,15 +63,15 @@ public class PlayerProgress {
         return status;
     }
 
-    public void setCurrentSectionId(int currentSectionId) {
+    void setCurrentSectionId(int currentSectionId) {
         this.currentSectionId = currentSectionId;
     }
 
-    public void setHealth(int health) {
+    void setHealth(int health) {
         this.health = health;
     }
 
-    public void setStatus(ProgressStatus status) {
+    void setStatus(ProgressStatus status) {
         this.status = status;
     }
 }
