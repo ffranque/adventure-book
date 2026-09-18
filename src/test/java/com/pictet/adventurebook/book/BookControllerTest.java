@@ -1,8 +1,7 @@
 package com.pictet.adventurebook.book;
 
 import com.pictet.adventurebook.book.dto.AddCategoryRequest;
-import com.pictet.adventurebook.book.dto.BookDetailResponse;
-import com.pictet.adventurebook.book.dto.BookSummaryResponse;
+import com.pictet.adventurebook.book.dto.BookResponse;
 import com.pictet.adventurebook.domain.Difficulty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,14 +19,14 @@ class BookControllerTest {
     private final BookService bookService = mock(BookService.class);
     private final BookController bookController = new BookController(bookService);
 
-    private BookSummaryResponse crystalCaverns;
-    private BookDetailResponse crystalCavernsDetail;
+    private BookResponse crystalCaverns;
+    private BookResponse crystalCavernsWithCategory;
 
     @BeforeEach
     void setUp() {
-        crystalCaverns = new BookSummaryResponse(
+        crystalCaverns = new BookResponse(
                 "abc-123", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, Set.of());
-        crystalCavernsDetail = new BookDetailResponse(
+        crystalCavernsWithCategory = new BookResponse(
                 "abc-123", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, Set.of("HORROR"));
     }
 
@@ -36,7 +35,7 @@ class BookControllerTest {
         when(bookService.search("crystal", "Evelyn", "horror", "EASY"))
                 .thenReturn(List.of(crystalCaverns));
 
-        List<BookSummaryResponse> result = bookController.search("crystal", "Evelyn", "horror", "EASY");
+        List<BookResponse> result = bookController.search("crystal", "Evelyn", "horror", "EASY");
 
         assertThat(result).containsExactly(crystalCaverns);
     }
@@ -45,37 +44,37 @@ class BookControllerTest {
     void searchWithNoFiltersPassesNullsThrough() {
         when(bookService.search(null, null, null, null)).thenReturn(List.of(crystalCaverns));
 
-        List<BookSummaryResponse> result = bookController.search(null, null, null, null);
+        List<BookResponse> result = bookController.search(null, null, null, null);
 
         assertThat(result).containsExactly(crystalCaverns);
     }
 
     @Test
     void getByIdReturnsBookFromService() {
-        when(bookService.getById("abc-123")).thenReturn(crystalCavernsDetail);
+        when(bookService.getById("abc-123")).thenReturn(crystalCavernsWithCategory);
 
-        BookDetailResponse result = bookController.getById("abc-123");
+        BookResponse result = bookController.getById("abc-123");
 
-        assertThat(result).isEqualTo(crystalCavernsDetail);
+        assertThat(result).isEqualTo(crystalCavernsWithCategory);
     }
 
     @Test
     void addCategoryDelegatesIdAndCategoryToService() {
-        when(bookService.addCategory("abc-123", "horror")).thenReturn(crystalCavernsDetail);
+        when(bookService.addCategory("abc-123", "horror")).thenReturn(crystalCavernsWithCategory);
 
-        BookDetailResponse result = bookController.addCategory("abc-123", new AddCategoryRequest("horror"));
+        BookResponse result = bookController.addCategory("abc-123", new AddCategoryRequest("horror"));
 
-        assertThat(result).isEqualTo(crystalCavernsDetail);
+        assertThat(result).isEqualTo(crystalCavernsWithCategory);
         verify(bookService).addCategory("abc-123", "horror");
     }
 
     @Test
     void removeCategoryDelegatesIdAndCategoryToService() {
-        when(bookService.removeCategory("abc-123", "HORROR")).thenReturn(crystalCavernsDetail);
+        when(bookService.removeCategory("abc-123", "HORROR")).thenReturn(crystalCaverns);
 
-        BookDetailResponse result = bookController.removeCategory("abc-123", "HORROR");
+        BookResponse result = bookController.removeCategory("abc-123", "HORROR");
 
-        assertThat(result).isEqualTo(crystalCavernsDetail);
+        assertThat(result).isEqualTo(crystalCaverns);
         verify(bookService).removeCategory("abc-123", "HORROR");
     }
 }

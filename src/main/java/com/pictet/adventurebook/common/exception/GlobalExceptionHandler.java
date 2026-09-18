@@ -5,6 +5,7 @@ import com.pictet.adventurebook.common.exception.adventure.InvalidOptionExceptio
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
 import com.pictet.adventurebook.common.exception.player.PlayerProgressNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -74,9 +76,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpected(Exception e) {
-        log.error("Unhandled exception", e);
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception e, HttpServletRequest request) {
+        String errorId = UUID.randomUUID().toString();
+        log.error("Unhandled exception [errorId={}] on {} {}",
+                errorId, request.getMethod(), request.getRequestURI(), e);
+
         return ResponseEntity.internalServerError()
-                .body(ErrorResponse.of("An unexpected error occurred"));
+                .body(ErrorResponse.ofUnexpected(errorId));
     }
 }

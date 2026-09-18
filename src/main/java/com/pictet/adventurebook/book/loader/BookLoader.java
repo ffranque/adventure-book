@@ -58,7 +58,10 @@ public class BookLoader {
     private Section toSection(RawSection rawSection) {
         List<Option> options = rawSection.options() == null
                 ? List.of()
-                : rawSection.options().stream().map(this::toOption).toList();
+                : rawSection.options().stream()
+                .map(this::toOption)
+                .toList();
+
         return new Section(rawSection.id(), rawSection.text(), parseEnum(SectionType.class, rawSection.type()), options);
     }
 

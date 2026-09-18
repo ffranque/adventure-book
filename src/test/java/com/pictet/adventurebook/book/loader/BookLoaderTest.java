@@ -1,11 +1,7 @@
 package com.pictet.adventurebook.book.loader;
 
 import com.pictet.adventurebook.common.exception.book.BookParsingException;
-import com.pictet.adventurebook.domain.Book;
-import com.pictet.adventurebook.domain.ConsequenceType;
-import com.pictet.adventurebook.domain.Difficulty;
-import com.pictet.adventurebook.domain.Section;
-import com.pictet.adventurebook.domain.SectionType;
+import com.pictet.adventurebook.domain.*;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -150,7 +146,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        var consequence = book.getSections().get(1).options().get(0).consequence();
+        Consequence consequence = book.getSections().get(1).options().get(0).consequence();
         assertThat(consequence.type()).isEqualTo(ConsequenceType.LOSE_HEALTH);
         assertThat(consequence.value()).isEqualTo(3);
         assertThat(consequence.text()).isEqualTo("ouch");

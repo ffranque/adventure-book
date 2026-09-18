@@ -1,7 +1,6 @@
 package com.pictet.adventurebook.book;
 
-import com.pictet.adventurebook.book.dto.BookDetailResponse;
-import com.pictet.adventurebook.book.dto.BookSummaryResponse;
+import com.pictet.adventurebook.book.dto.BookResponse;
 import com.pictet.adventurebook.common.exception.InvalidDifficultyException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
 import com.pictet.adventurebook.domain.Book;
@@ -29,9 +28,9 @@ class BookServiceTest {
         Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
         when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
 
-        List<BookSummaryResponse> result = bookService.search(null, null, null, null);
+        List<BookResponse> result = bookService.search(null, null, null, null);
 
-        assertThat(result).extracting(BookSummaryResponse::id).containsExactly("book-1", "book-2");
+        assertThat(result).extracting(BookResponse::id).containsExactly("book-1", "book-2");
     }
 
     @Test
@@ -40,9 +39,9 @@ class BookServiceTest {
         Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
         when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
 
-        List<BookSummaryResponse> result = bookService.search("CRYSTAL", null, null, null);
+        List<BookResponse> result = bookService.search("CRYSTAL", null, null, null);
 
-        assertThat(result).extracting(BookSummaryResponse::id).containsExactly("book-1");
+        assertThat(result).extracting(BookResponse::id).containsExactly("book-1");
     }
 
     @Test
@@ -51,9 +50,9 @@ class BookServiceTest {
         Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
         when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
 
-        List<BookSummaryResponse> result = bookService.search(null, "fuego", null, null);
+        List<BookResponse> result = bookService.search(null, "fuego", null, null);
 
-        assertThat(result).extracting(BookSummaryResponse::id).containsExactly("book-2");
+        assertThat(result).extracting(BookResponse::id).containsExactly("book-2");
     }
 
     @Test
@@ -62,9 +61,9 @@ class BookServiceTest {
         Book plainBook = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
         when(bookRepository.findAll()).thenReturn(List.of(horrorBook, plainBook));
 
-        List<BookSummaryResponse> result = bookService.search(null, null, "horror", null);
+        List<BookResponse> result = bookService.search(null, null, "horror", null);
 
-        assertThat(result).extracting(BookSummaryResponse::id).containsExactly("book-1");
+        assertThat(result).extracting(BookResponse::id).containsExactly("book-1");
     }
 
     @Test
@@ -73,9 +72,9 @@ class BookServiceTest {
         Book hardBook = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
         when(bookRepository.findAll()).thenReturn(List.of(easyBook, hardBook));
 
-        List<BookSummaryResponse> result = bookService.search(null, null, null, "hard");
+        List<BookResponse> result = bookService.search(null, null, null, "hard");
 
-        assertThat(result).extracting(BookSummaryResponse::id).containsExactly("book-2");
+        assertThat(result).extracting(BookResponse::id).containsExactly("book-2");
     }
 
     @Test
@@ -90,9 +89,9 @@ class BookServiceTest {
         Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, "HORROR");
         when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
 
-        BookDetailResponse result = bookService.getById("book-1");
+        BookResponse result = bookService.getById("book-1");
 
-        assertThat(result).isEqualTo(new BookDetailResponse(
+        assertThat(result).isEqualTo(new BookResponse(
                 "book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, Set.of("HORROR")));
     }
 
@@ -110,7 +109,7 @@ class BookServiceTest {
         Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
         when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
 
-        BookDetailResponse result = bookService.addCategory("book-1", "  horror  ");
+        BookResponse result = bookService.addCategory("book-1", "  horror  ");
 
         assertThat(result.categories()).containsExactly("HORROR");
         verify(bookRepository).save(book);
@@ -121,7 +120,7 @@ class BookServiceTest {
         Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, "HORROR");
         when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
 
-        BookDetailResponse result = bookService.removeCategory("book-1", "  horror  ");
+        BookResponse result = bookService.removeCategory("book-1", "  horror  ");
 
         assertThat(result.categories()).isEmpty();
         verify(bookRepository).save(book);

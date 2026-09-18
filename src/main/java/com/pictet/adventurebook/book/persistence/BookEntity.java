@@ -12,7 +12,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "book")
-
 public class BookEntity {
 
     @Id
