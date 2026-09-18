@@ -6,6 +6,7 @@ import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
 import com.pictet.adventurebook.domain.Book;
 import com.pictet.adventurebook.domain.Difficulty;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.util.*;
 
@@ -16,7 +17,8 @@ import static org.mockito.Mockito.*;
 class BookServiceTest {
 
     private final BookRepository bookRepository = mock(BookRepository.class);
-    private final BookService bookService = new BookService(bookRepository);
+    private final BookResponseMapper bookResponseMapper = Mappers.getMapper(BookResponseMapper.class);
+    private final BookService bookService = new BookService(bookRepository, bookResponseMapper);
 
     private Book newBook(String id, String title, String author, Difficulty difficulty, String... categories) {
         return new Book(id, title, author, difficulty, new HashSet<>(Set.of(categories)), new HashMap<>());

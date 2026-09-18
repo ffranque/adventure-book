@@ -8,15 +8,16 @@ import com.pictet.adventurebook.domain.Difficulty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final BookResponseMapper bookResponseMapper;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, BookResponseMapper bookResponseMapper) {
         this.bookRepository = bookRepository;
+        this.bookResponseMapper = bookResponseMapper;
     }
 
     public List<BookResponse> search(String title, String author, String category, String difficulty) {
@@ -27,12 +28,12 @@ public class BookService {
                 .filter(b -> author == null || containsIgnoreCase(b.getAuthor(), author))
                 .filter(b -> category == null || matchesCategory(b, category))
                 .filter(b -> parsedDifficulty == null || b.getDifficulty() == parsedDifficulty)
-                .map(this::toBookResponse)
+                .map(bookResponseMapper::toBookResponse)
                 .toList();
     }
 
     public BookResponse getById(String id) {
-        return toBookResponse(findOrThrow(id));
+        return bookResponseMapper.toBookResponse(findOrThrow(id));
     }
 
     public BookResponse addCategory(String id, String category) {
@@ -40,7 +41,7 @@ public class BookService {
         book.getCategories().add(normalizeCategory(category));
         bookRepository.save(book);
 
-        return toBookResponse(book);
+        return bookResponseMapper.toBookResponse(book);
     }
 
     public BookResponse removeCategory(String id, String category) {
@@ -48,7 +49,7 @@ public class BookService {
         book.getCategories().remove(normalizeCategory(category));
         bookRepository.save(book);
 
-        return toBookResponse(book);
+        return bookResponseMapper.toBookResponse(book);
     }
 
     private boolean containsIgnoreCase(String source, String target) {
@@ -76,15 +77,5 @@ public class BookService {
 
     private String normalizeCategory(String category) {
         return category.trim().toUpperCase();
-    }
-
-    private BookResponse toBookResponse(Book book) {
-        return new BookResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.getDifficulty(),
-                Set.copyOf(book.getCategories())
-        );
     }
 }

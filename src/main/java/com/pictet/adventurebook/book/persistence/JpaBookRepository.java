@@ -2,8 +2,8 @@ package com.pictet.adventurebook.book.persistence;
 
 import com.pictet.adventurebook.book.BookRepository;
 import com.pictet.adventurebook.domain.Book;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
