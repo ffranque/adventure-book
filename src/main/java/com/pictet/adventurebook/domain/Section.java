@@ -5,6 +5,6 @@ import java.util.List;
 public record Section(int id, String text, SectionType type, List<Option> options) {
 
     public Section {
-        options = options == null ? List.of() : options;
+        options = options == null ? List.of() : List.copyOf(options);
     }
 }

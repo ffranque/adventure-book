@@ -58,15 +58,7 @@ public class BookSeeder implements ApplicationRunner {
     }
 
     private Optional<Book> tryLoadBook(Resource resource) {
-        InputStream inputStream;
-        try {
-            inputStream = resource.getInputStream();
-        } catch (IOException e) {
-            log.warn("Skipping unreadable resource {}: {}", resource.getFilename(), e.getMessage());
-            return Optional.empty();
-        }
-
-        try {
+        try (InputStream inputStream = resource.getInputStream()) {
             Book book = bookLoader.load(inputStream);
             List<String> violations = bookValidator.validate(book);
             if (!violations.isEmpty()) {
@@ -77,6 +69,9 @@ public class BookSeeder implements ApplicationRunner {
             bookRepository.save(book);
             log.info("Loaded book: {} ({})", book.getTitle(), resource.getFilename());
             return Optional.of(book);
+        } catch (IOException e) {
+            log.warn("Skipping unreadable resource {}: {}", resource.getFilename(), e.getMessage());
+            return Optional.empty();
         } catch (BookParsingException e) {
             log.warn("Skipping unparseable book {}: {}", resource.getFilename(), e.getMessage());
             return Optional.empty();

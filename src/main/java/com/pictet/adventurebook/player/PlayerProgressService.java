@@ -33,8 +33,14 @@ public class PlayerProgressService {
             return toPlayResultResponse(existingPlayer.get());
         }
 
-        PlayerProgress progress = new PlayerProgress(
-                playerId, bookId, beginSection.id(), HealthRules.MAX_HEALTH, ProgressStatus.IN_PROGRESS);
+        PlayerProgress progress;
+        if (existingPlayer.isPresent()) {
+            progress = existingPlayer.get();
+            progress.advanceTo(beginSection.id(), HealthRules.MAX_HEALTH, ProgressStatus.IN_PROGRESS);
+        } else {
+            progress = new PlayerProgress(
+                    playerId, bookId, beginSection.id(), HealthRules.MAX_HEALTH, ProgressStatus.IN_PROGRESS);
+        }
         playerProgressRepository.save(progress);
 
         return new PlayResultResponse(beginSection, HealthRules.MAX_HEALTH, null, false, false);
@@ -49,9 +55,8 @@ public class PlayerProgressService {
         PlayResultResponse playResult = adventureService.choose(
                 bookId, progress.currentSectionId(), optionIndex, progress.health());
 
-        PlayerProgress updatedProgress = new PlayerProgress(playerId, bookId,
-                playResult.section().id(), playResult.health(), deriveStatus(playResult));
-        playerProgressRepository.save(updatedProgress);
+        progress.advanceTo(playResult.section().id(), playResult.health(), deriveStatus(playResult));
+        playerProgressRepository.save(progress);
 
         return playResult;
     }

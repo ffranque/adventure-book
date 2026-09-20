@@ -1,7 +1,6 @@
 package com.pictet.adventurebook.book;
 
-import com.pictet.adventurebook.book.dto.BookDetailResponse;
-import com.pictet.adventurebook.book.dto.BookSummaryResponse;
+import com.pictet.adventurebook.book.dto.BookResponse;
 import com.pictet.adventurebook.common.exception.InvalidDifficultyException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
 import com.pictet.adventurebook.domain.Book;
@@ -9,18 +8,19 @@ import com.pictet.adventurebook.domain.Difficulty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final BookResponseMapper bookResponseMapper;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, BookResponseMapper bookResponseMapper) {
         this.bookRepository = bookRepository;
+        this.bookResponseMapper = bookResponseMapper;
     }
 
-    public List<BookSummaryResponse> search(String title, String author, String category, String difficulty) {
+    public List<BookResponse> search(String title, String author, String category, String difficulty) {
         Difficulty parsedDifficulty = parseDifficultyOrThrow(difficulty);
 
         return bookRepository.findAll().stream()
@@ -28,28 +28,28 @@ public class BookService {
                 .filter(b -> author == null || containsIgnoreCase(b.getAuthor(), author))
                 .filter(b -> category == null || matchesCategory(b, category))
                 .filter(b -> parsedDifficulty == null || b.getDifficulty() == parsedDifficulty)
-                .map(this::toBookSummaryResponse)
+                .map(bookResponseMapper::toBookResponse)
                 .toList();
     }
 
-    public BookDetailResponse getById(String id) {
-        return toBookDetailResponse(findOrThrow(id));
+    public BookResponse getById(String id) {
+        return bookResponseMapper.toBookResponse(findOrThrow(id));
     }
 
-    public BookDetailResponse addCategory(String id, String category) {
+    public BookResponse addCategory(String id, String category) {
         Book book = findOrThrow(id);
         book.getCategories().add(normalizeCategory(category));
         bookRepository.save(book);
 
-        return toBookDetailResponse(book);
+        return bookResponseMapper.toBookResponse(book);
     }
 
-    public BookDetailResponse removeCategory(String id, String category) {
+    public BookResponse removeCategory(String id, String category) {
         Book book = findOrThrow(id);
         book.getCategories().remove(normalizeCategory(category));
         bookRepository.save(book);
 
-        return toBookDetailResponse(book);
+        return bookResponseMapper.toBookResponse(book);
     }
 
     private boolean containsIgnoreCase(String source, String target) {
@@ -77,25 +77,5 @@ public class BookService {
 
     private String normalizeCategory(String category) {
         return category.trim().toUpperCase();
-    }
-
-    private BookSummaryResponse toBookSummaryResponse(Book book) {
-        return new BookSummaryResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.getDifficulty(),
-                Set.copyOf(book.getCategories())
-        );
-    }
-
-    private BookDetailResponse toBookDetailResponse(Book book) {
-        return new BookDetailResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.getDifficulty(),
-                Set.copyOf(book.getCategories())
-        );
     }
 }

@@ -1,8 +1,7 @@
 package com.pictet.adventurebook.book;
 
 import com.pictet.adventurebook.book.dto.AddCategoryRequest;
-import com.pictet.adventurebook.book.dto.BookDetailResponse;
-import com.pictet.adventurebook.book.dto.BookSummaryResponse;
+import com.pictet.adventurebook.book.dto.BookResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +18,7 @@ public class BookController {
     }
 
     @GetMapping
-    public List<BookSummaryResponse> search(
+    public List<BookResponse> search(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String category,
@@ -29,19 +28,21 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public BookDetailResponse getById(@PathVariable String id) {
+    public BookResponse getById(@PathVariable String id) {
         return bookService.getById(id);
     }
 
     @PostMapping("/{id}/categories")
-    public BookDetailResponse addCategory(@PathVariable String id,
-                                          @Valid @RequestBody AddCategoryRequest request) {
+    public BookResponse addCategory(@PathVariable String id,
+                                    @Valid @RequestBody AddCategoryRequest request) {
+
         return bookService.addCategory(id, request.category());
     }
 
     @DeleteMapping("/{id}/categories/{category}")
-    public BookDetailResponse removeCategory(@PathVariable String id,
-                                             @PathVariable String category) {
+    public BookResponse removeCategory(@PathVariable String id,
+                                       @PathVariable String category) {
+
         return bookService.removeCategory(id, category);
     }
 }

@@ -3,6 +3,7 @@ package com.pictet.adventurebook.book.persistence;
 import com.pictet.adventurebook.book.BookRepository;
 import com.pictet.adventurebook.domain.Book;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class JpaBookRepository implements BookRepository {
     }
 
     @Override
+    @Transactional
     public Book save(Book book) {
         BookEntity saved = bookEntityRepository.save(bookEntityMapper.toBookEntity(book));
         return bookEntityMapper.toBookDomain(saved);

@@ -4,10 +4,12 @@ import com.pictet.adventurebook.book.dto.AddCategoryRequest;
 import com.pictet.adventurebook.common.exception.adventure.InvalidOptionException;
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,11 +33,15 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleUnexpected_returnsInternalServerErrorWithoutLeakingDetails() {
+        HttpServletRequest request = new MockHttpServletRequest("GET", "/api/books/abc-123");
+
         ResponseEntity<ErrorResponse> response = handler.handleUnexpected(
-                new NullPointerException("some internal npe detail"));
+                new NullPointerException("some internal npe detail"), request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody().message()).doesNotContain("some internal npe detail");
+        assertThat(response.getBody().errorId()).isNotBlank();
+        assertThat(response.getBody().message()).contains(response.getBody().errorId());
     }
 
     @Test

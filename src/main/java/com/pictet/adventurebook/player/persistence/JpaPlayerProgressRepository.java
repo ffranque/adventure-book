@@ -3,6 +3,7 @@ package com.pictet.adventurebook.player.persistence;
 import com.pictet.adventurebook.domain.PlayerProgress;
 import com.pictet.adventurebook.player.PlayerProgressRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ public class JpaPlayerProgressRepository implements PlayerProgressRepository {
     }
 
     @Override
+    @Transactional
     public PlayerProgress save(PlayerProgress progress) {
         PlayerProgressEntity entity = playerProgressEntityRepository
                 .findByPlayerIdAndBookId(progress.playerId(), progress.bookId())
