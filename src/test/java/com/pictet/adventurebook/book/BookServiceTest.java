@@ -3,7 +3,7 @@ package com.pictet.adventurebook.book;
 import com.pictet.adventurebook.book.dto.BookResponse;
 import com.pictet.adventurebook.common.exception.InvalidDifficultyException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
-import com.pictet.adventurebook.domain.Book;
+import com.pictet.adventurebook.domain.BookSummary;
 import com.pictet.adventurebook.domain.Difficulty;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -20,15 +20,14 @@ class BookServiceTest {
     private final BookResponseMapper bookResponseMapper = Mappers.getMapper(BookResponseMapper.class);
     private final BookService bookService = new BookService(bookRepository, bookResponseMapper);
 
-    private Book newBook(String id, String title, String author, Difficulty difficulty, String... categories) {
-        return new Book(id, title, author, difficulty, new HashSet<>(Set.of(categories)), new HashMap<>());
-    }
+    private final BookSummary crystalCaverns = new BookSummary(
+            "book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, Set.of("HORROR"));
+    private final BookSummary thePrisoner = new BookSummary(
+            "book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD, Set.of());
 
     @Test
-    void searchWithNoFiltersReturnsAllBooks() {
-        Book crystalCaverns = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
-        Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
-        when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
+    void searchWithNoFiltersDelegatesWithNullFilters() {
+        when(bookRepository.search(null, null, null, null)).thenReturn(List.of(crystalCaverns, thePrisoner));
 
         List<BookResponse> result = bookService.search(null, null, null, null);
 
@@ -36,43 +35,26 @@ class BookServiceTest {
     }
 
     @Test
-    void searchFiltersByTitleCaseInsensitiveSubstring() {
-        Book crystalCaverns = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
-        Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
-        when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
+    void searchPassesTitleAndAuthorThroughUnchanged() {
+        when(bookRepository.search("CRYSTAL", "storm", null, null)).thenReturn(List.of(crystalCaverns));
 
-        List<BookResponse> result = bookService.search("CRYSTAL", null, null, null);
+        List<BookResponse> result = bookService.search("CRYSTAL", "storm", null, null);
 
         assertThat(result).extracting(BookResponse::id).containsExactly("book-1");
     }
 
     @Test
-    void searchFiltersByAuthorCaseInsensitiveSubstring() {
-        Book crystalCaverns = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
-        Book thePrisoner = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
-        when(bookRepository.findAll()).thenReturn(List.of(crystalCaverns, thePrisoner));
+    void searchNormalizesCategory() {
+        when(bookRepository.search(null, null, "HORROR", null)).thenReturn(List.of(crystalCaverns));
 
-        List<BookResponse> result = bookService.search(null, "fuego", null, null);
-
-        assertThat(result).extracting(BookResponse::id).containsExactly("book-2");
-    }
-
-    @Test
-    void searchFiltersByCategoryCaseInsensitive() {
-        Book horrorBook = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, "HORROR");
-        Book plainBook = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
-        when(bookRepository.findAll()).thenReturn(List.of(horrorBook, plainBook));
-
-        List<BookResponse> result = bookService.search(null, null, "horror", null);
+        List<BookResponse> result = bookService.search(null, null, "  horror ", null);
 
         assertThat(result).extracting(BookResponse::id).containsExactly("book-1");
     }
 
     @Test
-    void searchFiltersByDifficulty() {
-        Book easyBook = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
-        Book hardBook = newBook("book-2", "The Prisoner", "Daniel El Fuego", Difficulty.HARD);
-        when(bookRepository.findAll()).thenReturn(List.of(easyBook, hardBook));
+    void searchParsesDifficultyCaseInsensitive() {
+        when(bookRepository.search(null, null, null, Difficulty.HARD)).thenReturn(List.of(thePrisoner));
 
         List<BookResponse> result = bookService.search(null, null, null, "hard");
 
@@ -84,12 +66,12 @@ class BookServiceTest {
         assertThatThrownBy(() -> bookService.search(null, null, null, "EXTREME"))
                 .isInstanceOf(InvalidDifficultyException.class)
                 .hasMessageContaining("EXTREME");
+        verifyNoInteractions(bookRepository);
     }
 
     @Test
     void getByIdReturnsMatchingBook() {
-        Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, "HORROR");
-        when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
+        when(bookRepository.findSummaryById("book-1")).thenReturn(Optional.of(crystalCaverns));
 
         BookResponse result = bookService.getById("book-1");
 
@@ -99,7 +81,7 @@ class BookServiceTest {
 
     @Test
     void getByIdWithUnknownIdThrowsBookNotFoundException() {
-        when(bookRepository.findById("missing")).thenReturn(Optional.empty());
+        when(bookRepository.findSummaryById("missing")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookService.getById("missing"))
                 .isInstanceOf(BookNotFoundException.class)
@@ -107,30 +89,37 @@ class BookServiceTest {
     }
 
     @Test
-    void addCategoryNormalizesAndSavesCategory() {
-        Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY);
-        when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
+    void addCategoryNormalizesBeforeDelegating() {
+        when(bookRepository.addCategory("book-1", "HORROR")).thenReturn(Optional.of(crystalCaverns));
 
         BookResponse result = bookService.addCategory("book-1", "  horror  ");
 
         assertThat(result.categories()).containsExactly("HORROR");
-        verify(bookRepository).save(book);
+        verify(bookRepository, never()).save(any());
     }
 
     @Test
-    void removeCategoryNormalizesAndRemovesCategory() {
-        Book book = newBook("book-1", "The Crystal Caverns", "Evelyn Stormrider", Difficulty.EASY, "HORROR");
-        when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
+    void addCategoryWithUnknownIdThrowsBookNotFoundException() {
+        when(bookRepository.addCategory("missing", "HORROR")).thenReturn(Optional.empty());
 
-        BookResponse result = bookService.removeCategory("book-1", "  horror  ");
+        assertThatThrownBy(() -> bookService.addCategory("missing", "horror"))
+                .isInstanceOf(BookNotFoundException.class)
+                .hasMessageContaining("missing");
+    }
+
+    @Test
+    void removeCategoryNormalizesBeforeDelegating() {
+        when(bookRepository.removeCategory("book-2", "HORROR")).thenReturn(Optional.of(thePrisoner));
+
+        BookResponse result = bookService.removeCategory("book-2", "  horror  ");
 
         assertThat(result.categories()).isEmpty();
-        verify(bookRepository).save(book);
+        verify(bookRepository, never()).save(any());
     }
 
     @Test
     void removeCategoryWithUnknownIdThrowsBookNotFoundException() {
-        when(bookRepository.findById("missing")).thenReturn(Optional.empty());
+        when(bookRepository.removeCategory("missing", "HORROR")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookService.removeCategory("missing", "horror"))
                 .isInstanceOf(BookNotFoundException.class)

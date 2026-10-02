@@ -22,12 +22,12 @@ public class BookEntity {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"))
     @Column(name = "category")
     private Set<String> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SUBSELECT)
     private List<SectionEntity> sections = new ArrayList<>();
 

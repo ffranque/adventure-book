@@ -4,6 +4,7 @@ import com.pictet.adventurebook.book.dto.AddCategoryRequest;
 import com.pictet.adventurebook.common.exception.adventure.InvalidOptionException;
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import com.pictet.adventurebook.common.exception.player.ConcurrentProgressUpdateException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
@@ -80,5 +81,14 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().message()).contains("5").contains("2");
+    }
+
+    @Test
+    void handleConcurrentProgressUpdate_returnsConflict() {
+        ResponseEntity<ErrorResponse> response = handler.handleConcurrentProgressUpdate(
+                new ConcurrentProgressUpdateException("alice", "book-1", null));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody().message()).contains("alice").contains("book-1");
     }
 }

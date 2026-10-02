@@ -1,7 +1,10 @@
 package com.pictet.adventurebook.player.persistence;
 
+import com.pictet.adventurebook.common.exception.player.ConcurrentProgressUpdateException;
 import com.pictet.adventurebook.domain.PlayerProgress;
 import com.pictet.adventurebook.player.PlayerProgressRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +31,27 @@ public class JpaPlayerProgressRepository implements PlayerProgressRepository {
     @Override
     @Transactional
     public PlayerProgress save(PlayerProgress progress) {
-        PlayerProgressEntity entity = playerProgressEntityRepository
-                .findByPlayerIdAndBookId(progress.playerId(), progress.bookId())
-                .map(existing -> playerProgressEntityMapper.updatePlayerProgressEntity(existing, progress))
-                .orElseGet(() -> playerProgressEntityMapper.toPlayerProgressEntity(progress));
+        try {
+            PlayerProgressEntity entity = playerProgressEntityRepository
+                    .findByPlayerIdAndBookId(progress.playerId(), progress.bookId())
+                    .map(existing -> updateIfUnchanged(existing, progress))
+                    .orElseGet(() -> playerProgressEntityMapper.toPlayerProgressEntity(progress));
 
-        PlayerProgressEntity saved = playerProgressEntityRepository.save(entity);
+            PlayerProgressEntity saved = playerProgressEntityRepository.saveAndFlush(entity);
 
-        return playerProgressEntityMapper.toPlayerProgressDomain(saved);
+            return playerProgressEntityMapper.toPlayerProgressDomain(saved);
+        } catch (OptimisticLockingFailureException | DataIntegrityViolationException e) {
+            throw new ConcurrentProgressUpdateException(progress.playerId(), progress.bookId(), e);
+        }
+    }
+
+    private PlayerProgressEntity updateIfUnchanged(PlayerProgressEntity existing, PlayerProgress progress) {
+        if (progress.version() == null || existing.getVersion() != progress.version()) {
+            throw new OptimisticLockingFailureException(
+                    "Stale player progress: read version " + progress.version()
+                            + " but stored version is " + existing.getVersion());
+        }
+
+        return playerProgressEntityMapper.updatePlayerProgressEntity(existing, progress);
     }
 }

@@ -23,11 +23,11 @@ public class SectionEntity {
     @Enumerated(EnumType.STRING)
     private SectionType type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private BookEntity book;
 
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SUBSELECT)
     @OrderColumn(name = "option_order")
     private List<OptionEntity> options = new ArrayList<>();

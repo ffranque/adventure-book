@@ -7,13 +7,20 @@ public class PlayerProgress {
     private int currentSectionId;
     private int health;
     private ProgressStatus status;
+    private final Long version;
 
     public PlayerProgress(String playerId, String bookId, int currentSectionId, int health, ProgressStatus status) {
+        this(playerId, bookId, currentSectionId, health, status, null);
+    }
+
+    public PlayerProgress(String playerId, String bookId, int currentSectionId, int health, ProgressStatus status,
+                          Long version) {
         this.playerId = playerId;
         this.bookId = bookId;
         this.currentSectionId = currentSectionId;
         this.health = health;
         this.status = status;
+        this.version = version;
     }
 
     public void advanceTo(int currentSectionId, int health, ProgressStatus status) {
@@ -40,5 +47,9 @@ public class PlayerProgress {
 
     public ProgressStatus status() {
         return status;
+    }
+
+    public Long version() {
+        return version;
     }
 }

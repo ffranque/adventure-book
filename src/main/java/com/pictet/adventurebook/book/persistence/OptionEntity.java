@@ -12,7 +12,7 @@ public class OptionEntity {
     private String description;
     private int gotoId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private SectionEntity section;
 

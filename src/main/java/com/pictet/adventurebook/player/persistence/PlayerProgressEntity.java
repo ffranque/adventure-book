@@ -28,6 +28,9 @@ public class PlayerProgressEntity {
     @Column(nullable = false)
     private ProgressStatus status;
 
+    @Version
+    private long version;
+
     protected PlayerProgressEntity() {
     }
 
@@ -61,6 +64,10 @@ public class PlayerProgressEntity {
 
     public ProgressStatus getStatus() {
         return status;
+    }
+
+    public long getVersion() {
+        return version;
     }
 
     void setCurrentSectionId(int currentSectionId) {

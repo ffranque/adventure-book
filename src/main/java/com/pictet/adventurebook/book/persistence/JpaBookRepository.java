@@ -2,6 +2,8 @@ package com.pictet.adventurebook.book.persistence;
 
 import com.pictet.adventurebook.book.BookRepository;
 import com.pictet.adventurebook.domain.Book;
+import com.pictet.adventurebook.domain.BookSummary;
+import com.pictet.adventurebook.domain.Difficulty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,21 +22,45 @@ public class JpaBookRepository implements BookRepository {
     }
 
     @Override
-    public List<Book> findAll() {
-        return bookEntityRepository.findAll().stream()
-                .map(bookEntityMapper::toBookDomain)
+    public List<BookSummary> search(String title, String author, String category, Difficulty difficulty) {
+        return bookEntityRepository.search(title, author, category, difficulty)
+                .stream()
+                .map(bookEntityMapper::toBookSummary)
                 .toList();
     }
 
     @Override
+    public Optional<BookSummary> findSummaryById(String id) {
+        return bookEntityRepository.findWithCategoriesById(id).map(bookEntityMapper::toBookSummary);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Book> findById(String id) {
-        return bookEntityRepository.findById(id).map(bookEntityMapper::toBookDomain);
+        return bookEntityRepository.findWithSectionsById(id).map(bookEntityMapper::toBookDomain);
+    }
+
+    @Override
+    public Book save(Book book) {
+        BookEntity saved = bookEntityRepository.save(bookEntityMapper.toBookEntity(book));
+        return bookEntityMapper.toBookDomain(saved);
     }
 
     @Override
     @Transactional
-    public Book save(Book book) {
-        BookEntity saved = bookEntityRepository.save(bookEntityMapper.toBookEntity(book));
-        return bookEntityMapper.toBookDomain(saved);
+    public Optional<BookSummary> addCategory(String id, String category) {
+        return bookEntityRepository.findWithCategoriesById(id).map(entity -> {
+            entity.getCategories().add(category);
+            return bookEntityMapper.toBookSummary(entity);
+        });
+    }
+
+    @Override
+    @Transactional
+    public Optional<BookSummary> removeCategory(String id, String category) {
+        return bookEntityRepository.findWithCategoriesById(id).map(entity -> {
+            entity.getCategories().remove(category);
+            return bookEntityMapper.toBookSummary(entity);
+        });
     }
 }

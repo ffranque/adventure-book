@@ -4,6 +4,7 @@ import com.pictet.adventurebook.common.exception.adventure.AdventureAlreadyFinis
 import com.pictet.adventurebook.common.exception.adventure.InvalidOptionException;
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import com.pictet.adventurebook.common.exception.player.ConcurrentProgressUpdateException;
 import com.pictet.adventurebook.common.exception.player.PlayerProgressNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -55,6 +56,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AdventureAlreadyFinishedException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyFinished(AdventureAlreadyFinishedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    @ExceptionHandler(ConcurrentProgressUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleConcurrentProgressUpdate(ConcurrentProgressUpdateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(e.getMessage()));
     }

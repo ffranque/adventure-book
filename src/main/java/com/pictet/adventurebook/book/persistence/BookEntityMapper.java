@@ -1,6 +1,7 @@
 package com.pictet.adventurebook.book.persistence;
 
 import com.pictet.adventurebook.domain.Book;
+import com.pictet.adventurebook.domain.BookSummary;
 import com.pictet.adventurebook.domain.Consequence;
 import com.pictet.adventurebook.domain.Option;
 import com.pictet.adventurebook.domain.Section;
@@ -39,6 +40,11 @@ class BookEntityMapper {
 
     private ConsequenceEmbeddable toConsequenceEmbeddable(Consequence consequence) {
         return new ConsequenceEmbeddable(consequence.type(), consequence.value(), consequence.text());
+    }
+
+    BookSummary toBookSummary(BookEntity entity) {
+        return new BookSummary(entity.getId(), entity.getTitle(), entity.getAuthor(), entity.getDifficulty(),
+                entity.getCategories());
     }
 
     Book toBookDomain(BookEntity entity) {

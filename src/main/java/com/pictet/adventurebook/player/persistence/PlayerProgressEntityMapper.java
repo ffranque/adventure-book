@@ -21,6 +21,6 @@ class PlayerProgressEntityMapper {
 
     PlayerProgress toPlayerProgressDomain(PlayerProgressEntity entity) {
         return new PlayerProgress(entity.getPlayerId(), entity.getBookId(),
-                entity.getCurrentSectionId(), entity.getHealth(), entity.getStatus());
+                entity.getCurrentSectionId(), entity.getHealth(), entity.getStatus(), entity.getVersion());
     }
 }
