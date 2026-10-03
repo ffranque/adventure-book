@@ -25,6 +25,8 @@ public interface BookEntityRepository extends JpaRepository<BookEntity, String> 
                             @Param("category") String category,
                             @Param("difficulty") Difficulty difficulty);
 
+    boolean existsBySource(String source);
+
     @EntityGraph(attributePaths = "categories")
     Optional<BookEntity> findWithCategoriesById(String id);
 

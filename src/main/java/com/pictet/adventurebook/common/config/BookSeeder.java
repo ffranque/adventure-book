@@ -44,7 +44,7 @@ public class BookSeeder implements ApplicationRunner {
         Resource [] resources = resourcePatternResolver.getResources(BOOKS_LOCATION_PATTERN);
 
         if (resources.length == 0) {
-            log.warn("No books found in " + BOOKS_LOCATION_PATTERN);
+            log.warn("No books found in {}", BOOKS_LOCATION_PATTERN);
         }
 
         int loadedBooks = 0;
@@ -58,6 +58,12 @@ public class BookSeeder implements ApplicationRunner {
     }
 
     private Optional<Book> tryLoadBook(Resource resource) {
+        String source = resource.getFilename();
+        if (bookRepository.existsBySource(source)) {
+            log.debug("Skipping already loaded book {}", source);
+            return Optional.empty();
+        }
+
         try (InputStream inputStream = resource.getInputStream()) {
             Book book = bookLoader.load(inputStream);
             List<String> violations = bookValidator.validate(book);
@@ -66,9 +72,9 @@ public class BookSeeder implements ApplicationRunner {
                 return Optional.empty();
             }
 
-            bookRepository.save(book);
-            log.info("Loaded book: {} ({})", book.getTitle(), resource.getFilename());
-            return Optional.of(book);
+            Book saved = bookRepository.save(source, book);
+            log.info("Loaded book: {} ({})", saved.getTitle(), source);
+            return Optional.of(saved);
         } catch (IOException e) {
             log.warn("Skipping unreadable resource {}: {}", resource.getFilename(), e.getMessage());
             return Optional.empty();

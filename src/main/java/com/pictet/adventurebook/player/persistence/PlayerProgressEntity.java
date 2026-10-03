@@ -5,17 +5,19 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "player_progress",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"playerId", "bookId"}))
+        uniqueConstraints = @UniqueConstraint(name = "uk_player_progress_player_book",
+                columnNames = {"player_id", "book_id"}))
 public class PlayerProgressEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "player_progress_seq")
+    @SequenceGenerator(name = "player_progress_seq", sequenceName = "player_progress_seq", allocationSize = 50)
     private Long id;
 
     @Column(nullable = false)
     private String playerId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 36)
     private String bookId;
 
     @Column(nullable = false)

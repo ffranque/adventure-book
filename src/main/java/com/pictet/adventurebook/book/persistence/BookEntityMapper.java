@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Component
 class BookEntityMapper {
 
-    BookEntity toBookEntity(Book book) {
-        BookEntity entity = new BookEntity(book.getId(), book.getTitle(), book.getAuthor(),
+    BookEntity toBookEntity(String source, Book book) {
+        BookEntity entity = new BookEntity(source, book.getTitle(), book.getAuthor(),
                 book.getDifficulty(), new HashSet<>(book.getCategories()));
         book.getSections().values().forEach(section -> entity.addSection(toSectionEntity(section)));
 

@@ -9,22 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "section")
+@Table(name = "section",
+        uniqueConstraints = @UniqueConstraint(name = "uk_section_book_number",
+                columnNames = {"book_id", "section_number"}))
 public class SectionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "section_seq")
+    @SequenceGenerator(name = "section_seq", sequenceName = "section_seq", allocationSize = 50)
     private Long id;
+
+    @Column(nullable = false)
     private int sectionNumber;
 
     @Column(length = 2000)
     private String text;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private SectionType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "book_id", nullable = false)
     private BookEntity book;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)

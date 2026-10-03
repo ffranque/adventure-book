@@ -43,12 +43,12 @@ class BookLoaderTest {
     }
 
     @Test
-    void fromRawGeneratesEightCharacterAlphanumericId() {
+    void fromRawLeavesIdUnsetForTheDatabaseToAssign() {
         RawBook rawBook = rawBookWith("Title", "Author", "easy", null, List.of(rawSection(1, "END")));
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getId()).matches("[23456789abcdefghjkmnpqrstuvwxyz]{8}");
+        assertThat(book.getId()).isNull();
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.pictet.adventurebook.domain.Difficulty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,16 +16,27 @@ import java.util.Set;
 public class BookEntity {
 
     @Id
+    @UuidGenerator
+    @Column(length = 36)
     private String id;
+
+    @Column(nullable = false, unique = true)
+    private String source;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String author;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Difficulty difficulty;
 
     @ElementCollection
-    @CollectionTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "category")
+    @CollectionTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"),
+            indexes = @Index(name = "idx_book_categories_category", columnList = "category"))
+    @Column(name = "category", nullable = false)
     private Set<String> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -34,8 +46,8 @@ public class BookEntity {
     protected BookEntity() {
     }
 
-    BookEntity(String id, String title, String author, Difficulty difficulty, Set<String> categories) {
-        this.id = id;
+    BookEntity(String source, String title, String author, Difficulty difficulty, Set<String> categories) {
+        this.source = source;
         this.title = title;
         this.author = author;
         this.difficulty = difficulty;
@@ -49,6 +61,10 @@ public class BookEntity {
 
     public String getId() {
         return id;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String getTitle() {

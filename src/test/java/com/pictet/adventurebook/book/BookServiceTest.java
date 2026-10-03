@@ -95,7 +95,7 @@ class BookServiceTest {
         BookResponse result = bookService.addCategory("book-1", "  horror  ");
 
         assertThat(result.categories()).containsExactly("HORROR");
-        verify(bookRepository, never()).save(any());
+        verify(bookRepository, never()).save(any(), any());
     }
 
     @Test
@@ -114,7 +114,7 @@ class BookServiceTest {
         BookResponse result = bookService.removeCategory("book-2", "  horror  ");
 
         assertThat(result.categories()).isEmpty();
-        verify(bookRepository, never()).save(any());
+        verify(bookRepository, never()).save(any(), any());
     }
 
     @Test

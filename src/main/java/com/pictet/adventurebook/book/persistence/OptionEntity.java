@@ -3,17 +3,21 @@ package com.pictet.adventurebook.book.persistence;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "option")
+@Table(name = "section_option",
+        indexes = @Index(name = "idx_section_option_section", columnList = "section_id"))
 public class OptionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "section_option_seq")
+    @SequenceGenerator(name = "section_option_seq", sequenceName = "section_option_seq", allocationSize = 50)
     private Long id;
     private String description;
+
+    @Column(nullable = false)
     private int gotoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "section_id", nullable = false)
     private SectionEntity section;
 
     @Embedded

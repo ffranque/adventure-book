@@ -4,10 +4,12 @@ import com.pictet.adventurebook.common.exception.player.ConcurrentProgressUpdate
 import com.pictet.adventurebook.domain.PlayerProgress;
 import com.pictet.adventurebook.domain.ProgressStatus;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +28,20 @@ class JpaPlayerProgressRepositoryTest {
     @Autowired
     private PlayerProgressEntityRepository entityRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // player_progress.book_id has a foreign key to book
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.update("insert into book (id, source, title, author, difficulty) "
+                + "values ('book-1', 'book-1.json', 'Title', 'Author', 'EASY')");
+    }
+
     @AfterEach
     void tearDown() {
         entityRepository.deleteAll();
+        jdbcTemplate.update("delete from book");
     }
 
     @Test

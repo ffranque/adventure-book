@@ -8,14 +8,10 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
 public class BookLoader {
-
-    private static final String ID_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz";
-    private static final int ID_LENGTH = 8;
 
     private final JsonMapper jsonMapper;
 
@@ -50,7 +46,8 @@ public class BookLoader {
                             throw new BookParsingException("duplicate section id: " + a.id());
                         }));
 
-        return new Book(generateId(), requireNonBlank(rawBook.title(), "title"),
+        // The id is assigned by the database when the book is saved.
+        return new Book(null, requireNonBlank(rawBook.title(), "title"),
                 requireNonBlank(rawBook.author(), "author"),
                 parseEnum(Difficulty.class, rawBook.difficulty()), categories, sections);
     }
@@ -99,13 +96,5 @@ public class BookLoader {
         } catch (IllegalArgumentException e) {
             throw new BookParsingException("unknown " + type.getSimpleName() + ": " + value);
         }
-    }
-
-    private String generateId() {
-        StringBuilder id = new StringBuilder(ID_LENGTH);
-        for (int i = 0; i < ID_LENGTH; i++) {
-            id.append(ID_ALPHABET.charAt(ThreadLocalRandom.current().nextInt(ID_ALPHABET.length())));
-        }
-        return id.toString();
     }
 }

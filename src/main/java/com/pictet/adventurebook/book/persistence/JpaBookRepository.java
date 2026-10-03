@@ -41,8 +41,13 @@ public class JpaBookRepository implements BookRepository {
     }
 
     @Override
-    public Book save(Book book) {
-        BookEntity saved = bookEntityRepository.save(bookEntityMapper.toBookEntity(book));
+    public boolean existsBySource(String source) {
+        return bookEntityRepository.existsBySource(source);
+    }
+
+    @Override
+    public Book save(String source, Book book) {
+        BookEntity saved = bookEntityRepository.save(bookEntityMapper.toBookEntity(source, book));
         return bookEntityMapper.toBookDomain(saved);
     }
 

@@ -15,7 +15,9 @@ public interface BookRepository {
 
     Optional<Book> findById(String id);
 
-    Book save(Book book);
+    boolean existsBySource(String source);
+
+    Book save(String source, Book book);
 
     Optional<BookSummary> addCategory(String id, String category);
 
