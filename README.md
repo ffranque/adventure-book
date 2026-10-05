@@ -1,6 +1,6 @@
 # Adventure Book API
 
-A REST API for browsing a collection of adventure books, reading through them, and tracking per-player progress with health/consequence mechanics.
+A REST API for browsing a collection of adventure books, and reading through them with health and consequence mechanics.
 
 ## Tech stack
 
@@ -27,23 +27,17 @@ com.adventurebook
 │   └── persistence/   JPA entities and repository implementations
 ├── adventure/         stateless gameplay: begin, read a section, choose an option
 │   └── dto/
-├── player/            per-player progress
-│   ├── PlayerProgressService, PlayerController, PlayerProgressRepository
-│   ├── domain/        PlayerProgress, ProgressStatus
-│   ├── exception/
-│   ├── dto/
-│   └── persistence/
 └── common/
-    ├── exception/     NotFoundException, ConflictException, InvalidRequestException
+    ├── exception/     NotFoundException, InvalidRequestException
     └── web/           GlobalExceptionHandler, ErrorResponse
 ```
 
 ### Dependency rules
 
-- Features depend on each other in one direction only: `player → adventure → book`. Every feature can use `common`, and `common` depends on no feature.
-- Services depend on repository interfaces (`BookRepository`, `SectionRepository`, `PlayerProgressRepository`) defined at the root of `book` and `player`. The JPA implementations in `persistence/` are the only code that touches entities and Spring Data, and nothing outside `persistence/` uses them.
+- Features depend on each other in one direction only: `adventure → book`. Every feature can use `common`, and `common` depends on no feature.
+- Services depend on repository interfaces (`BookRepository`, `SectionRepository`) defined at the root of `book`. The JPA implementations in `persistence/` are the only code that touches entities and Spring Data, and nothing outside `persistence/` uses them.
 - `domain/` and `exception/` contain plain Java: no Spring, Jakarta or Hibernate. The domain holds the game rules (`Consequence.applyTo`, `Section.option`) and doesn't depend on services, DTOs or persistence.
-- Feature exceptions extend one of the three base types in `common.exception`. `GlobalExceptionHandler` maps each base type to an HTTP status, so a new exception gets the right status without changes to `common`.
+- Feature exceptions extend one of the two base types in `common.exception`. `GlobalExceptionHandler` maps each base type to an HTTP status, so a new exception gets the right status without changes to `common`.
 
 ## Running the app
 
@@ -84,7 +78,7 @@ spring:
 
 The schema is created by Flyway from `src/main/resources/db/migration` on startup. Hibernate only validates that the entities match it (`ddl-auto: validate`), so schema changes go in a new migration file, not in the entities alone.
 
-The database is **in-memory** — all data (books, categories, player progress) resets every time the app restarts.
+The database is **in-memory** — all data (books and categories) resets every time the app restarts.
 
 You can inspect the database directly at `http://localhost:8080/h2-console` while the app is running — JDBC URL `jdbc:h2:mem:adventurebook`, default user `sa`, no password.
 
@@ -122,9 +116,8 @@ Every error returns the same shape, regardless of status code:
 | Status | When |
 |--------|------|
 | `400` | Request body is missing, is not valid JSON or fails validation, non-numeric path variable, unknown difficulty, option index out of range |
-| `404` | Book, section, or player progress not found, or no endpoint matches the URL |
+| `404` | Book or section not found, or no endpoint matches the URL |
 | `405` | HTTP method not supported by the endpoint; the `Allow` header lists the supported ones |
-| `409` | Choosing in a finished adventure, or a concurrent update to the same player's progress |
 | `500` | Anything unexpected |
 
 ## Manual verification
@@ -181,28 +174,4 @@ curl "localhost:8080/api/v1/books/{id}/sections/begin"
 curl -X POST "localhost:8080/api/v1/books/{id}/sections/{sectionId}/choose" \
   -H "Content-Type: application/json" -d '{"optionIndex": 0, "currentHealth": 10}'
 # response includes: section, health, consequenceText, dead, gameOver
-```
-
----
-
-### Objective 5 — Per-player progress
-
-```bash
-curl -X POST "localhost:8080/api/v1/players/alice/books/{bookId}/start"
-# health 10, at the BEGIN section — persisted to H2
-# calling start again during an in-progress run returns the current progress;
-# after the run ends (dead or END section), start begins a new run
-
-curl -X POST "localhost:8080/api/v1/players/alice/books/{bookId}/choose" \
-  -H "Content-Type: application/json" -d '{"optionIndex": 0}'
-# no currentHealth in the request — the server already knows it from the DB
-
-curl "localhost:8080/api/v1/players/alice/books/{bookId}/progress"
-# matches the last choose response, except consequenceText — that field isn't
-# persisted, so progress always reports it as null even after a consequence-bearing choose
-
-# Player isolation
-curl -X POST "localhost:8080/api/v1/players/bob/books/{bookId}/start"
-curl "localhost:8080/api/v1/players/alice/books/{bookId}/progress"
-# alice's progress is untouched by bob starting his own run
 ```
