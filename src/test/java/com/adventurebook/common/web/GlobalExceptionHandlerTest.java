@@ -5,7 +5,6 @@ import com.adventurebook.book.exception.BookNotFoundException;
 import com.adventurebook.book.exception.InvalidDifficultyException;
 import com.adventurebook.book.exception.InvalidOptionException;
 import com.adventurebook.book.exception.SectionNotFoundException;
-import com.adventurebook.player.exception.ConcurrentProgressUpdateException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
@@ -136,14 +135,5 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().message()).isEqualTo("sectionId must be a number");
-    }
-
-    @Test
-    void handleConcurrentProgressUpdate_returnsConflict() {
-        ResponseEntity<ErrorResponse> response = handler.handleConflict(
-                new ConcurrentProgressUpdateException("alice", "book-1", null));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(response.getBody().message()).contains("alice").contains("book-1");
     }
 }

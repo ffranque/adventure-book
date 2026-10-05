@@ -1,6 +1,5 @@
 package com.adventurebook.common.web;
 
-import com.adventurebook.common.exception.ConflictException;
 import com.adventurebook.common.exception.InvalidRequestException;
 import com.adventurebook.common.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,12 +26,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(e.getMessage()));
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(ConflictException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(e.getMessage()));
     }
 
