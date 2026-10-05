@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidRequest(InvalidRequestException e) {
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    // Unknown URLs reach Spring's static resource handler, which throws this.
+    // Without a handler it would fall through to handleUnexpected and become a 500.
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResource(NoResourceFoundException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of("No endpoint for " + request.getMethod() + " " + request.getRequestURI()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

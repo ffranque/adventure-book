@@ -122,7 +122,7 @@ Every error returns the same shape, regardless of status code:
 | Status | When |
 |--------|------|
 | `400` | Request body fails validation, non-numeric path variable, unknown difficulty, option index out of range |
-| `404` | Book, section, or player progress not found |
+| `404` | Book, section, or player progress not found, or no endpoint matches the URL |
 | `409` | Choosing in a finished adventure, or a concurrent update to the same player's progress |
 | `500` | Anything unexpected |
 
