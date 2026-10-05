@@ -1,6 +1,6 @@
 package com.adventurebook.player.persistence;
 
-import com.adventurebook.domain.PlayerProgress;
+import com.adventurebook.player.PlayerProgress;
 import org.springframework.stereotype.Component;
 
 @Component

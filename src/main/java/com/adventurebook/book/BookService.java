@@ -1,10 +1,6 @@
 package com.adventurebook.book;
 
 import com.adventurebook.book.dto.BookResponse;
-import com.adventurebook.common.exception.InvalidDifficultyException;
-import com.adventurebook.common.exception.book.BookNotFoundException;
-import com.adventurebook.domain.Category;
-import com.adventurebook.domain.Difficulty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

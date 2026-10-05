@@ -1,6 +1,6 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.domain.*;
+import com.adventurebook.book.*;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;

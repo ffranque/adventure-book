@@ -2,7 +2,7 @@ package com.adventurebook.player;
 
 import com.adventurebook.adventure.dto.PlayResultResponse;
 import com.adventurebook.adventure.dto.SectionResponse;
-import com.adventurebook.domain.SectionType;
+import com.adventurebook.book.SectionType;
 import com.adventurebook.player.dto.PlayerChooseRequest;
 import org.junit.jupiter.api.Test;
 

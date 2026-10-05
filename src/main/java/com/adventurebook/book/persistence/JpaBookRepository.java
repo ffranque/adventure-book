@@ -1,9 +1,9 @@
 package com.adventurebook.book.persistence;
 
+import com.adventurebook.book.Book;
 import com.adventurebook.book.BookRepository;
-import com.adventurebook.domain.Book;
-import com.adventurebook.domain.BookSummary;
-import com.adventurebook.domain.Difficulty;
+import com.adventurebook.book.BookSummary;
+import com.adventurebook.book.Difficulty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

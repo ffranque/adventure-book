@@ -1,10 +1,6 @@
 package com.adventurebook.book;
 
 import com.adventurebook.book.dto.BookResponse;
-import com.adventurebook.common.exception.InvalidDifficultyException;
-import com.adventurebook.common.exception.book.BookNotFoundException;
-import com.adventurebook.domain.BookSummary;
-import com.adventurebook.domain.Difficulty;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
