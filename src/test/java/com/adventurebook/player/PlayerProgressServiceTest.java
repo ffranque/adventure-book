@@ -3,8 +3,12 @@ package com.adventurebook.player;
 import com.adventurebook.adventure.AdventureService;
 import com.adventurebook.adventure.dto.PlayResultResponse;
 import com.adventurebook.adventure.dto.SectionResponse;
-import com.adventurebook.book.HealthRules;
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.HealthRules;
+import com.adventurebook.book.domain.SectionType;
+import com.adventurebook.player.domain.PlayerProgress;
+import com.adventurebook.player.domain.ProgressStatus;
+import com.adventurebook.player.exception.AdventureAlreadyFinishedException;
+import com.adventurebook.player.exception.PlayerProgressNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

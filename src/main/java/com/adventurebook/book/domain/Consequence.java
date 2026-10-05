@@ -1,4 +1,4 @@
-package com.adventurebook.book;
+package com.adventurebook.book.domain;
 
 public record Consequence(ConsequenceType type, int value, String text) {
 

@@ -1,5 +1,6 @@
-package com.adventurebook.book;
+package com.adventurebook.book.domain;
 
+import com.adventurebook.book.exception.InvalidOptionException;
 
 import java.util.List;
 

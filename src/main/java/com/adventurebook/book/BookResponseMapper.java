@@ -1,5 +1,6 @@
 package com.adventurebook.book;
 
+import com.adventurebook.book.domain.BookSummary;
 import com.adventurebook.book.dto.BookResponse;
 import org.mapstruct.Mapper;
 

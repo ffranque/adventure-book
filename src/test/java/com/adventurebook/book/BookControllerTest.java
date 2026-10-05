@@ -1,5 +1,6 @@
 package com.adventurebook.book;
 
+import com.adventurebook.book.domain.Difficulty;
 import com.adventurebook.book.dto.AddCategoryRequest;
 import com.adventurebook.book.dto.BookResponse;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,10 +1,10 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.book.Book;
-import com.adventurebook.book.BookSummary;
-import com.adventurebook.book.Consequence;
-import com.adventurebook.book.Option;
-import com.adventurebook.book.Section;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.BookSummary;
+import com.adventurebook.book.domain.Consequence;
+import com.adventurebook.book.domain.Option;
+import com.adventurebook.book.domain.Section;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;

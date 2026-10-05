@@ -1,6 +1,7 @@
-package com.adventurebook.player;
+package com.adventurebook.player.exception;
 
 import com.adventurebook.common.exception.ConflictException;
+import com.adventurebook.player.domain.ProgressStatus;
 
 public class AdventureAlreadyFinishedException extends ConflictException {
 

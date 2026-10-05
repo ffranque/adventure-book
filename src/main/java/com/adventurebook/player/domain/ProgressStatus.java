@@ -1,4 +1,4 @@
-package com.adventurebook.player;
+package com.adventurebook.player.domain;
 
 public enum ProgressStatus {
 

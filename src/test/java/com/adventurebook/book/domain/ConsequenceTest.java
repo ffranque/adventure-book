@@ -1,4 +1,4 @@
-package com.adventurebook.book;
+package com.adventurebook.book.domain;
 
 import org.junit.jupiter.api.Test;
 

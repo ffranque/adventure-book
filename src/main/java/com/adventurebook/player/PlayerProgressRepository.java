@@ -1,5 +1,6 @@
 package com.adventurebook.player;
 
+import com.adventurebook.player.domain.PlayerProgress;
 
 import java.util.Optional;
 

@@ -1,11 +1,11 @@
 package com.adventurebook.common.web;
 
-import com.adventurebook.book.BookNotFoundException;
-import com.adventurebook.book.InvalidDifficultyException;
-import com.adventurebook.book.InvalidOptionException;
-import com.adventurebook.book.SectionNotFoundException;
 import com.adventurebook.book.dto.AddCategoryRequest;
-import com.adventurebook.player.ConcurrentProgressUpdateException;
+import com.adventurebook.book.exception.BookNotFoundException;
+import com.adventurebook.book.exception.InvalidDifficultyException;
+import com.adventurebook.book.exception.InvalidOptionException;
+import com.adventurebook.book.exception.SectionNotFoundException;
+import com.adventurebook.player.exception.ConcurrentProgressUpdateException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;

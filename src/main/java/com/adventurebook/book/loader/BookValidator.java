@@ -1,9 +1,9 @@
 package com.adventurebook.book.loader;
 
-import com.adventurebook.book.Book;
-import com.adventurebook.book.Option;
-import com.adventurebook.book.Section;
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.Option;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

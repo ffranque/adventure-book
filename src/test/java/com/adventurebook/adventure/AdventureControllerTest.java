@@ -3,7 +3,7 @@ package com.adventurebook.adventure;
 import com.adventurebook.adventure.dto.ChooseOptionRequest;
 import com.adventurebook.adventure.dto.PlayResultResponse;
 import com.adventurebook.adventure.dto.SectionResponse;
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.SectionType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

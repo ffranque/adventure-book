@@ -1,6 +1,6 @@
 package com.adventurebook.book.dto;
 
-import com.adventurebook.book.Difficulty;
+import com.adventurebook.book.domain.Difficulty;
 
 import java.util.Set;
 

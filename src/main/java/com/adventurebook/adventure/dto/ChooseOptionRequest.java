@@ -1,6 +1,6 @@
 package com.adventurebook.adventure.dto;
 
-import com.adventurebook.book.HealthRules;
+import com.adventurebook.book.domain.HealthRules;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

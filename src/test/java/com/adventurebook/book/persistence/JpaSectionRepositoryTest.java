@@ -1,6 +1,12 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.book.*;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.Consequence;
+import com.adventurebook.book.domain.ConsequenceType;
+import com.adventurebook.book.domain.Difficulty;
+import com.adventurebook.book.domain.Option;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;

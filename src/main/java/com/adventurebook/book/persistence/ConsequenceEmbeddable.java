@@ -1,6 +1,6 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.book.ConsequenceType;
+import com.adventurebook.book.domain.ConsequenceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

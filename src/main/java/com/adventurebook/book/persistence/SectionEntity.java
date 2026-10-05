@@ -1,6 +1,6 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.SectionType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;

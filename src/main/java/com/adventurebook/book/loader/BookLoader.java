@@ -1,6 +1,13 @@
 package com.adventurebook.book.loader;
 
-import com.adventurebook.book.*;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.Category;
+import com.adventurebook.book.domain.Consequence;
+import com.adventurebook.book.domain.ConsequenceType;
+import com.adventurebook.book.domain.Difficulty;
+import com.adventurebook.book.domain.Option;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;

@@ -1,7 +1,7 @@
 package com.adventurebook.book.loader;
 
-import com.adventurebook.book.Book;
 import com.adventurebook.book.BookRepository;
+import com.adventurebook.book.domain.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;

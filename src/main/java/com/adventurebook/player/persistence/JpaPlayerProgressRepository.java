@@ -1,8 +1,8 @@
 package com.adventurebook.player.persistence;
 
-import com.adventurebook.player.ConcurrentProgressUpdateException;
-import com.adventurebook.player.PlayerProgress;
 import com.adventurebook.player.PlayerProgressRepository;
+import com.adventurebook.player.domain.PlayerProgress;
+import com.adventurebook.player.exception.ConcurrentProgressUpdateException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;

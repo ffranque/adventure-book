@@ -1,4 +1,4 @@
-package com.adventurebook.book;
+package com.adventurebook.book.domain;
 
 import java.util.Map;
 import java.util.Set;

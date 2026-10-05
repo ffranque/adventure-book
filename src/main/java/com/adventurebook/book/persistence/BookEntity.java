@@ -1,6 +1,6 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.book.Difficulty;
+import com.adventurebook.book.domain.Difficulty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;

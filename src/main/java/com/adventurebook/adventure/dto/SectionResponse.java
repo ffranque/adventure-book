@@ -1,6 +1,6 @@
 package com.adventurebook.adventure.dto;
 
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.SectionType;
 
 import java.util.List;
 

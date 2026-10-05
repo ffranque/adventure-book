@@ -1,4 +1,4 @@
-package com.adventurebook.player;
+package com.adventurebook.player.exception;
 
 import com.adventurebook.common.exception.ConflictException;
 

@@ -2,18 +2,18 @@ package com.adventurebook.adventure;
 
 import com.adventurebook.adventure.dto.PlayResultResponse;
 import com.adventurebook.adventure.dto.SectionResponse;
-import com.adventurebook.book.Book;
-import com.adventurebook.book.BookNotFoundException;
 import com.adventurebook.book.BookRepository;
-import com.adventurebook.book.Consequence;
-import com.adventurebook.book.ConsequenceType;
-import com.adventurebook.book.Difficulty;
-import com.adventurebook.book.InvalidOptionException;
-import com.adventurebook.book.Option;
-import com.adventurebook.book.Section;
-import com.adventurebook.book.SectionNotFoundException;
 import com.adventurebook.book.SectionRepository;
-import com.adventurebook.book.SectionType;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.Consequence;
+import com.adventurebook.book.domain.ConsequenceType;
+import com.adventurebook.book.domain.Difficulty;
+import com.adventurebook.book.domain.Option;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
+import com.adventurebook.book.exception.BookNotFoundException;
+import com.adventurebook.book.exception.InvalidOptionException;
+import com.adventurebook.book.exception.SectionNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

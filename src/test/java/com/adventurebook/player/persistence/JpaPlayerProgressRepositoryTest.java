@@ -1,8 +1,8 @@
 package com.adventurebook.player.persistence;
 
-import com.adventurebook.player.ConcurrentProgressUpdateException;
-import com.adventurebook.player.PlayerProgress;
-import com.adventurebook.player.ProgressStatus;
+import com.adventurebook.player.domain.PlayerProgress;
+import com.adventurebook.player.domain.ProgressStatus;
+import com.adventurebook.player.exception.ConcurrentProgressUpdateException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
