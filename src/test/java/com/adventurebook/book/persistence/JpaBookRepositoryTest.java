@@ -19,8 +19,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// Not transactional: every repository call commits on its own, exactly as in production,
-// so lazy-loading outside a transaction and real flush behaviour are exercised.
 @DataJpaTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Import({JpaBookRepository.class, BookEntityMapper.class})

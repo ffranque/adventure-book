@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-// Not transactional: each save commits on its own so version checks behave as in production.
 @DataJpaTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Import({JpaPlayerProgressRepository.class, PlayerProgressEntityMapper.class})
@@ -31,7 +30,6 @@ class JpaPlayerProgressRepositoryTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // player_progress.book_id has a foreign key to book
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("insert into book (id, source, title, author, difficulty) "
