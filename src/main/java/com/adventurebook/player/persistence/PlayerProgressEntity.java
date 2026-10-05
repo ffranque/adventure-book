@@ -1,6 +1,6 @@
 package com.adventurebook.player.persistence;
 
-import com.adventurebook.domain.ProgressStatus;
+import com.adventurebook.player.domain.ProgressStatus;
 import jakarta.persistence.*;
 
 @Entity

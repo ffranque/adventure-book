@@ -1,6 +1,6 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.domain.Difficulty;
+import com.adventurebook.book.domain.Difficulty;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

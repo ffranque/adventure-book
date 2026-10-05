@@ -1,8 +1,8 @@
 package com.adventurebook.book.persistence;
 
-import com.adventurebook.adventure.SectionRepository;
-import com.adventurebook.domain.Section;
-import com.adventurebook.domain.SectionType;
+import com.adventurebook.book.SectionRepository;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

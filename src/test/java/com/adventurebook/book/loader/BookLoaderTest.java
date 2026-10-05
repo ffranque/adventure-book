@@ -1,7 +1,11 @@
 package com.adventurebook.book.loader;
 
-import com.adventurebook.common.exception.book.BookParsingException;
-import com.adventurebook.domain.*;
+import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.domain.Consequence;
+import com.adventurebook.book.domain.ConsequenceType;
+import com.adventurebook.book.domain.Difficulty;
+import com.adventurebook.book.domain.Section;
+import com.adventurebook.book.domain.SectionType;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 

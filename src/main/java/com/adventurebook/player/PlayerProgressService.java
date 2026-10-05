@@ -3,11 +3,11 @@ package com.adventurebook.player;
 import com.adventurebook.adventure.AdventureService;
 import com.adventurebook.adventure.dto.PlayResultResponse;
 import com.adventurebook.adventure.dto.SectionResponse;
-import com.adventurebook.common.exception.adventure.AdventureAlreadyFinishedException;
-import com.adventurebook.common.exception.player.PlayerProgressNotFoundException;
-import com.adventurebook.domain.HealthRules;
-import com.adventurebook.domain.PlayerProgress;
-import com.adventurebook.domain.ProgressStatus;
+import com.adventurebook.book.domain.HealthRules;
+import com.adventurebook.player.domain.PlayerProgress;
+import com.adventurebook.player.domain.ProgressStatus;
+import com.adventurebook.player.exception.AdventureAlreadyFinishedException;
+import com.adventurebook.player.exception.PlayerProgressNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
