@@ -9,15 +9,20 @@ import com.adventurebook.player.exception.ConcurrentProgressUpdateException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -97,6 +102,29 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody().message()).isEqualTo("No endpoint for GET /api/v1/unknown");
         assertThat(response.getBody().errorId()).isNull();
+    }
+
+    @Test
+    void handleUnreadableBody_returnsBadRequestWithoutParserDetails() {
+        HttpMessageNotReadableException e = new HttpMessageNotReadableException(
+                "JSON parse error: Unexpected character at com.example.Internal", mock(HttpInputMessage.class));
+
+        ResponseEntity<ErrorResponse> response = handler.handleUnreadableBody(e);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("Request body is missing or is not valid JSON");
+    }
+
+    @Test
+    void handleMethodNotSupported_returnsMethodNotAllowedWithAllowHeader() {
+        HttpServletRequest request = new MockHttpServletRequest("DELETE", "/api/v1/books");
+        HttpRequestMethodNotSupportedException e = new HttpRequestMethodNotSupportedException("DELETE", List.of("GET"));
+
+        ResponseEntity<ErrorResponse> response = handler.handleMethodNotSupported(e, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
+        assertThat(response.getHeaders().getAllow()).containsExactly(HttpMethod.GET);
+        assertThat(response.getBody().message()).isEqualTo("DELETE is not supported for /api/v1/books");
     }
 
     @Test
