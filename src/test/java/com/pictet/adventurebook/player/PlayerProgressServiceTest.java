@@ -55,7 +55,6 @@ class PlayerProgressServiceTest {
     @Test
     void startWithInProgressExistingRunReturnsExistingProgressWithoutSaving() {
         PlayerProgress existing = new PlayerProgress("alice", "book-1", 5, 7, ProgressStatus.IN_PROGRESS);
-        when(adventureService.begin("book-1")).thenReturn(beginSection);
         when(playerProgressRepository.findByPlayerIdAndBookId("alice", "book-1")).thenReturn(Optional.of(existing));
         SectionResponse currentSection = new SectionResponse(5, "A fork in the path.", SectionType.NODE, List.of());
         when(adventureService.getSection("book-1", 5)).thenReturn(currentSection);
@@ -65,6 +64,7 @@ class PlayerProgressServiceTest {
         assertThat(result.section()).isEqualTo(currentSection);
         assertThat(result.health()).isEqualTo(7);
         verify(playerProgressRepository, never()).save(existing);
+        verify(adventureService, never()).begin("book-1");
     }
 
     @Test

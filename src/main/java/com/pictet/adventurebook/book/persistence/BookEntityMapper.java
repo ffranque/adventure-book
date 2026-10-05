@@ -56,7 +56,7 @@ class BookEntityMapper {
                 new HashSet<>(entity.getCategories()), sections);
     }
 
-    private Section toSectionDomain(SectionEntity entity) {
+    Section toSectionDomain(SectionEntity entity) {
         List<Option> options = entity.getOptions().stream()
                 .map(this::toOptionDomain)
                 .toList();

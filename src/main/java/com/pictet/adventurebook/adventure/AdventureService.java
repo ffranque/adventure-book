@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 @Service
 public class AdventureService {
 
+    private final SectionRepository sectionRepository;
     private final BookRepository bookRepository;
 
     private static final Map<ConsequenceType, IntBinaryOperator> CONSEQUENCE_HANDLERS = Map.of(
@@ -25,30 +26,28 @@ public class AdventureService {
             ConsequenceType.GAIN_HEALTH, Integer::sum
     );
 
-    public AdventureService(BookRepository bookRepository) {
+    public AdventureService(SectionRepository sectionRepository, BookRepository bookRepository) {
+        this.sectionRepository = sectionRepository;
         this.bookRepository = bookRepository;
     }
 
     public SectionResponse begin(String bookId) {
-        Book book = findBookOrThrow(bookId);
-        return toSectionResponse(findBeginSection(book));
+        return toSectionResponse(findBeginSectionOrThrow(bookId));
     }
 
     public SectionResponse getSection(String bookId, int sectionId) {
-        Book book = findBookOrThrow(bookId);
-        return toSectionResponse(findSectionOrThrow(book, sectionId));
+        return toSectionResponse(findSectionOrThrow(bookId, sectionId));
     }
 
     public PlayResultResponse choose(String bookId, int sectionId, int optionIndex, int currentHealth) {
-        Book book = findBookOrThrow(bookId);
-        Section currentSection = findSectionOrThrow(book, sectionId);
+        Section currentSection = findSectionOrThrow(bookId, sectionId);
 
         if (optionIndex >= currentSection.options().size()) {
             throw new InvalidOptionException(optionIndex, currentSection.options().size());
         }
 
         Option chosenOption = currentSection.options().get(optionIndex);
-        Section nextSection = findSectionOrThrow(book, chosenOption.gotoId());
+        Section nextSection = findSectionOrThrow(bookId, chosenOption.gotoId());
 
         int newHealth = currentHealth;
         String consequenceText = null;
@@ -64,27 +63,30 @@ public class AdventureService {
         return new PlayResultResponse(toSectionResponse(nextSection), newHealth, consequenceText, dead, gameOver);
     }
 
-    private Book findBookOrThrow(String bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new BookNotFoundException(bookId));
+    // The book's existence is only checked when the section lookup misses,
+    // so the normal path costs a single query.
+    private Section findSectionOrThrow(String bookId, int sectionId) {
+        return sectionRepository.findSection(bookId, sectionId)
+                .orElseThrow(() -> {
+                    requireBookExists(bookId);
+                    return new SectionNotFoundException(bookId, sectionId);
+                });
     }
 
-    private Section findSectionOrThrow(Book book, int sectionId) {
-        Section section = book.getSections().get(sectionId);
-        if (section == null) {
-            throw new SectionNotFoundException(book.getId(), sectionId);
+    private Section findBeginSectionOrThrow(String bookId) {
+        return sectionRepository.findBeginSection(bookId)
+                .orElseThrow(() -> {
+                    requireBookExists(bookId);
+                    return new IllegalStateException(
+                            "Book " + bookId + " has no BEGIN section — should be impossible, "
+                                    + "BookValidator should have rejected it at load time");
+                });
+    }
+
+    private void requireBookExists(String bookId) {
+        if (!bookRepository.existsById(bookId)) {
+            throw new BookNotFoundException(bookId);
         }
-
-        return section;
-    }
-
-    private Section findBeginSection(Book book) {
-        return book.getSections().values().stream()
-                .filter(s -> s.type() == SectionType.BEGIN)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Book " + book.getId() + " has no BEGIN section — should be impossible, "
-                                + "BookValidator should have rejected it at load time"));
     }
 
     private SectionResponse toSectionResponse(Section section) {

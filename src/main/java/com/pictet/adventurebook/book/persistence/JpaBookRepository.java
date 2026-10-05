@@ -35,9 +35,8 @@ public class JpaBookRepository implements BookRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<Book> findById(String id) {
-        return bookEntityRepository.findWithSectionsById(id).map(bookEntityMapper::toBookDomain);
+    public boolean existsById(String id) {
+        return bookEntityRepository.existsById(id);
     }
 
     @Override

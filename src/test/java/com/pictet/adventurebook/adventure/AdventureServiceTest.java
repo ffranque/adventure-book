@@ -24,12 +24,15 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AdventureServiceTest {
 
+    private final SectionRepository sectionRepository = mock(SectionRepository.class);
     private final BookRepository bookRepository = mock(BookRepository.class);
-    private final AdventureService adventureService = new AdventureService(bookRepository);
+    private final AdventureService adventureService = new AdventureService(sectionRepository, bookRepository);
 
     private Book bookWithSections(Section... sections) {
         Map<Integer, Section> sectionsById = new HashMap<>();
@@ -40,7 +43,13 @@ class AdventureServiceTest {
     }
 
     private void givenBook(Book book) {
-        when(bookRepository.findById("book-1")).thenReturn(Optional.of(book));
+        when(bookRepository.existsById("book-1")).thenReturn(true);
+        for (Section section : book.getSections().values()) {
+            when(sectionRepository.findSection("book-1", section.id())).thenReturn(Optional.of(section));
+            if (section.type() == SectionType.BEGIN) {
+                when(sectionRepository.findBeginSection("book-1")).thenReturn(Optional.of(section));
+            }
+        }
     }
 
     @Test
@@ -57,12 +66,11 @@ class AdventureServiceTest {
         assertThat(result.options()).hasSize(1);
         assertThat(result.options().get(0).index()).isEqualTo(0);
         assertThat(result.options().get(0).gotoId()).isEqualTo(2);
+        verify(bookRepository, never()).existsById("book-1");
     }
 
     @Test
     void beginWithUnknownBookThrowsBookNotFoundException() {
-        when(bookRepository.findById("missing")).thenReturn(Optional.empty());
-
         assertThatThrownBy(() -> adventureService.begin("missing"))
                 .isInstanceOf(BookNotFoundException.class)
                 .hasMessageContaining("missing");
@@ -92,8 +100,6 @@ class AdventureServiceTest {
 
     @Test
     void getSectionWithUnknownBookThrowsBookNotFoundException() {
-        when(bookRepository.findById("missing")).thenReturn(Optional.empty());
-
         assertThatThrownBy(() -> adventureService.getSection("missing", 1))
                 .isInstanceOf(BookNotFoundException.class)
                 .hasMessageContaining("missing");
@@ -194,8 +200,6 @@ class AdventureServiceTest {
 
     @Test
     void chooseWithUnknownBookThrowsBookNotFoundException() {
-        when(bookRepository.findById("missing")).thenReturn(Optional.empty());
-
         assertThatThrownBy(() -> adventureService.choose("missing", 1, 0, 10))
                 .isInstanceOf(BookNotFoundException.class)
                 .hasMessageContaining("missing");

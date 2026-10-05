@@ -29,7 +29,4 @@ public interface BookEntityRepository extends JpaRepository<BookEntity, String> 
 
     @EntityGraph(attributePaths = "categories")
     Optional<BookEntity> findWithCategoriesById(String id);
-
-    @EntityGraph(attributePaths = {"categories", "sections"})
-    Optional<BookEntity> findWithSectionsById(String id);
 }

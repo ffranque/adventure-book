@@ -110,18 +110,6 @@ class JpaBookRepositoryTest {
     }
 
     @Test
-    void findByIdLoadsSectionsAndOptionsOutsideCallerTransaction() {
-        Book book = repository.findById(cc).orElseThrow();
-
-        assertThat(book.getSections()).containsOnlyKeys(1, 2);
-        assertThat(book.getSections().get(1).options())
-                .extracting(Option::gotoId)
-                .containsExactly(2, 2);
-        assertThat(book.getSections().get(1).options().get(1).consequence())
-                .isEqualTo(new Consequence(ConsequenceType.LOSE_HEALTH, 3, "Ouch"));
-    }
-
-    @Test
     void findSummaryByIdReturnsMetadataWithoutLoadingSections() {
         BookSummary summary = repository.findSummaryById(cc).orElseThrow();
 
@@ -148,6 +136,12 @@ class JpaBookRepositoryTest {
         assertThat(result.categories()).isEmpty();
         assertThat(statistics.getEntityDeleteCount()).isZero();
         assertThat(repository.findSummaryById(cc).orElseThrow().categories()).isEmpty();
+    }
+
+    @Test
+    void existsByIdReflectsStoredBooks() {
+        assertThat(repository.existsById(cc)).isTrue();
+        assertThat(repository.existsById("missing")).isFalse();
     }
 
     @Test

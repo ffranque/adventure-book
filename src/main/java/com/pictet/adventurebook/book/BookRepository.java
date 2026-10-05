@@ -13,7 +13,7 @@ public interface BookRepository {
 
     Optional<BookSummary> findSummaryById(String id);
 
-    Optional<Book> findById(String id);
+    boolean existsById(String id);
 
     boolean existsBySource(String source);
 
