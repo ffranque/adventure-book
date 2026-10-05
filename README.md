@@ -1,6 +1,6 @@
 # Adventure Book API
 
-A REST API for browsing a collection of adventure books, and reading through them with health and consequence mechanics.
+A REST API for browsing a collection of adventure books and reading through them with health and consequence mechanics.
 
 ## Tech stack
 
@@ -31,13 +31,6 @@ com.adventurebook
     ├── exception/     NotFoundException, InvalidRequestException
     └── web/           GlobalExceptionHandler, ErrorResponse
 ```
-
-### Dependency rules
-
-- Features depend on each other in one direction only: `adventure → book`. Every feature can use `common`, and `common` depends on no feature.
-- Services depend on repository interfaces (`BookRepository`, `SectionRepository`) defined at the root of `book`. The JPA implementations in `persistence/` are the only code that touches entities and Spring Data, and nothing outside `persistence/` uses them.
-- `domain/` and `exception/` contain plain Java: no Spring, Jakarta or Hibernate. The domain holds the game rules (`Consequence.applyTo`, `Section.option`) and doesn't depend on services, DTOs or persistence.
-- Feature exceptions extend one of the two base types in `common.exception`. `GlobalExceptionHandler` maps each base type to an HTTP status, so a new exception gets the right status without changes to `common`.
 
 ## Running the app
 
@@ -71,12 +64,21 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
   h2:
     console:
       enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
 ```
 
-The schema is created by Flyway from `src/main/resources/db/migration` on startup. Hibernate only validates that the entities match it (`ddl-auto: validate`), so schema changes go in a new migration file, not in the entities alone.
+The schema is created by Flyway from `src/main/resources/db/migration` on startup. Hibernate only validates that the entities match it (`ddl-auto: validate`), so schema changes go in a new migration file, not in the entities alone. Applied migrations are never edited: `V2__drop_player_progress.sql` drops the table left over from the removed per-player progress feature instead of changing `V1__init.sql`.
+
+Every SQL statement Hibernate runs is logged, formatted over several lines, through the `org.hibernate.SQL` logger. To see parameter values instead of `?` placeholders, add `org.hibernate.orm.jdbc.bind: trace` under `logging.level`. To turn SQL logging off, set `org.hibernate.SQL` to `info`.
 
 The database is **in-memory** — all data (books and categories) resets every time the app restarts.
 
