@@ -4,15 +4,16 @@ import com.pictet.adventurebook.adventure.dto.OptionResponse;
 import com.pictet.adventurebook.adventure.dto.PlayResultResponse;
 import com.pictet.adventurebook.adventure.dto.SectionResponse;
 import com.pictet.adventurebook.book.BookRepository;
-import com.pictet.adventurebook.common.exception.adventure.InvalidOptionException;
 import com.pictet.adventurebook.common.exception.adventure.SectionNotFoundException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import com.pictet.adventurebook.domain.HealthRules;
+import com.pictet.adventurebook.domain.Option;
+import com.pictet.adventurebook.domain.Section;
+import com.pictet.adventurebook.domain.SectionType;
 import com.pictet.adventurebook.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.IntBinaryOperator;
 import java.util.stream.IntStream;
 
 @Service
@@ -20,11 +21,6 @@ public class AdventureService {
 
     private final SectionRepository sectionRepository;
     private final BookRepository bookRepository;
-
-    private static final Map<ConsequenceType, IntBinaryOperator> CONSEQUENCE_HANDLERS = Map.of(
-            ConsequenceType.LOSE_HEALTH, (health, value) -> health - value,
-            ConsequenceType.GAIN_HEALTH, Integer::sum
-    );
 
     public AdventureService(SectionRepository sectionRepository, BookRepository bookRepository) {
         this.sectionRepository = sectionRepository;
@@ -40,20 +36,14 @@ public class AdventureService {
     }
 
     public PlayResultResponse choose(String bookId, int sectionId, int optionIndex, int currentHealth) {
-        Section currentSection = findSectionOrThrow(bookId, sectionId);
-
-        if (optionIndex >= currentSection.options().size()) {
-            throw new InvalidOptionException(optionIndex, currentSection.options().size());
-        }
-
-        Option chosenOption = currentSection.options().get(optionIndex);
+        Option chosenOption = findSectionOrThrow(bookId, sectionId).option(optionIndex);
         Section nextSection = findSectionOrThrow(bookId, chosenOption.gotoId());
 
         int newHealth = currentHealth;
         String consequenceText = null;
 
         if (chosenOption.consequence() != null) {
-            newHealth = applyConsequence(chosenOption.consequence(), currentHealth);
+            newHealth = chosenOption.consequence().applyTo(currentHealth);
             consequenceText = chosenOption.consequence().text();
         }
 
@@ -63,8 +53,6 @@ public class AdventureService {
         return new PlayResultResponse(toSectionResponse(nextSection), newHealth, consequenceText, dead, gameOver);
     }
 
-    // The book's existence is only checked when the section lookup misses,
-    // so the normal path costs a single query.
     private Section findSectionOrThrow(String bookId, int sectionId) {
         return sectionRepository.findSection(bookId, sectionId)
                 .orElseThrow(() -> {
@@ -98,17 +86,5 @@ public class AdventureService {
                 .toList();
 
         return new SectionResponse(section.id(), section.text(), section.type(), options);
-    }
-
-    private int applyConsequence(Consequence consequence, int currentHealth) {
-        IntBinaryOperator operator = CONSEQUENCE_HANDLERS.get(consequence.type());
-        if (operator == null) {
-            throw new IllegalStateException("Unhandled consequence type: " + consequence.type());
-        }
-        return clampHealth(operator.applyAsInt(currentHealth, consequence.value()));
-    }
-
-    private int clampHealth(int health) {
-        return Math.clamp(health, HealthRules.MIN_HEALTH, HealthRules.MAX_HEALTH);
     }
 }

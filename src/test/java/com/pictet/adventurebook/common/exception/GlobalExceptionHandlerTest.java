@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -81,6 +82,17 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().message()).contains("5").contains("2");
+    }
+
+    @Test
+    void handleTypeMismatch_returnsBadRequestNamingTheParameter() {
+        MethodArgumentTypeMismatchException e = new MethodArgumentTypeMismatchException(
+                "abc", Integer.class, "sectionId", mock(MethodParameter.class), null);
+
+        ResponseEntity<ErrorResponse> response = handler.handleValidation(e);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("sectionId must be a number");
     }
 
     @Test

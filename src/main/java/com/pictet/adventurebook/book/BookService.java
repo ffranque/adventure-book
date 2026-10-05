@@ -3,6 +3,7 @@ package com.pictet.adventurebook.book;
 import com.pictet.adventurebook.book.dto.BookResponse;
 import com.pictet.adventurebook.common.exception.InvalidDifficultyException;
 import com.pictet.adventurebook.common.exception.book.BookNotFoundException;
+import com.pictet.adventurebook.domain.Category;
 import com.pictet.adventurebook.domain.Difficulty;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class BookService {
 
     public List<BookResponse> search(String title, String author, String category, String difficulty) {
         Difficulty parsedDifficulty = parseDifficultyOrThrow(difficulty);
-        String normalizedCategory = category == null ? null : normalizeCategory(category);
+        String normalizedCategory = category == null ? null : Category.normalize(category);
 
         return bookRepository.search(title, author, normalizedCategory, parsedDifficulty).stream()
                 .map(bookResponseMapper::toBookResponse)
@@ -35,13 +36,13 @@ public class BookService {
     }
 
     public BookResponse addCategory(String id, String category) {
-        return bookRepository.addCategory(id, normalizeCategory(category))
+        return bookRepository.addCategory(id, Category.normalize(category))
                 .map(bookResponseMapper::toBookResponse)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
     public BookResponse removeCategory(String id, String category) {
-        return bookRepository.removeCategory(id, normalizeCategory(category))
+        return bookRepository.removeCategory(id, Category.normalize(category))
                 .map(bookResponseMapper::toBookResponse)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
@@ -54,9 +55,5 @@ public class BookService {
         } catch (IllegalArgumentException e) {
             throw new InvalidDifficultyException(difficulty);
         }
-    }
-
-    private String normalizeCategory(String category) {
-        return category.trim().toUpperCase();
     }
 }

@@ -78,8 +78,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentTypeMismatchException e) {
-        return  ResponseEntity.badRequest()
-                .body(ErrorResponse.of("SectionId must be a number"));
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.of(e.getName() + " must be a number"));
     }
 
     @ExceptionHandler(Exception.class)

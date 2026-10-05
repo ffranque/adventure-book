@@ -37,7 +37,7 @@ public class BookLoader {
         Set<String> categories = rawBook.categories() == null
                 ? Set.of()
                 : rawBook.categories().stream()
-                .map(this::normalizeCategory)
+                .map(Category::normalize)
                 .collect(Collectors.toSet());
 
         Map<Integer, Section> sections = rawBook.sections().stream()
@@ -76,10 +76,6 @@ public class BookLoader {
         }
 
         return new Consequence(parseEnum(ConsequenceType.class, rawConsequence.type()), value, rawConsequence.text());
-    }
-
-    private String normalizeCategory(String category) {
-        return category.trim().toUpperCase();
     }
 
     private String requireNonBlank(String value, String fieldName) {
