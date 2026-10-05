@@ -8,7 +8,7 @@
         <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.pictet</groupId>
+    <groupId>com.adventurebook</groupId>
     <artifactId>adventurebook</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>adventurebook</name>
