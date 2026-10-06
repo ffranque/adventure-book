@@ -8,6 +8,7 @@ import com.adventurebook.book.domain.Difficulty;
 import com.adventurebook.book.domain.Option;
 import com.adventurebook.book.domain.Section;
 import com.adventurebook.book.domain.SectionType;
+import com.adventurebook.book.exception.BookParsingException;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;

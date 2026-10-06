@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 class BookEntityMapper {
 
     BookEntity toBookEntity(String source, Book book) {
-        BookEntity entity = new BookEntity(source, book.getTitle(), book.getAuthor(),
-                book.getDifficulty(), new HashSet<>(book.getCategories()));
-        book.getSections().values().forEach(section -> entity.addSection(toSectionEntity(section)));
+        BookEntity entity = new BookEntity(source, book.title(), book.author(),
+                book.difficulty(), new HashSet<>(book.categories()));
+        book.sections().values().forEach(section -> entity.addSection(toSectionEntity(section)));
 
         return entity;
     }
@@ -53,7 +53,7 @@ class BookEntityMapper {
                 .collect(Collectors.toMap(Section::id, Function.identity()));
 
         return new Book(entity.getId(), entity.getTitle(), entity.getAuthor(), entity.getDifficulty(),
-                new HashSet<>(entity.getCategories()), sections);
+                entity.getCategories(), sections);
     }
 
     Section toSectionDomain(SectionEntity entity) {
