@@ -6,6 +6,7 @@ import com.adventurebook.book.domain.ConsequenceType;
 import com.adventurebook.book.domain.Difficulty;
 import com.adventurebook.book.domain.Section;
 import com.adventurebook.book.domain.SectionType;
+import com.adventurebook.book.exception.BookParsingException;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -38,12 +39,12 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getTitle()).isEqualTo("The Crystal Caverns");
-        assertThat(book.getAuthor()).isEqualTo("Evelyn Stormrider");
-        assertThat(book.getDifficulty()).isEqualTo(Difficulty.EASY);
-        assertThat(book.getSections()).hasSize(2);
-        assertThat(book.getSections().get(1).type()).isEqualTo(SectionType.BEGIN);
-        assertThat(book.getSections().get(2).type()).isEqualTo(SectionType.END);
+        assertThat(book.title()).isEqualTo("The Crystal Caverns");
+        assertThat(book.author()).isEqualTo("Evelyn Stormrider");
+        assertThat(book.difficulty()).isEqualTo(Difficulty.EASY);
+        assertThat(book.sections()).hasSize(2);
+        assertThat(book.sections().get(1).type()).isEqualTo(SectionType.BEGIN);
+        assertThat(book.sections().get(2).type()).isEqualTo(SectionType.END);
     }
 
     @Test
@@ -52,7 +53,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getId()).isNull();
+        assertThat(book.id()).isNull();
     }
 
     @Test
@@ -62,7 +63,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getCategories()).containsExactlyInAnyOrder("HORROR", "PUZZLE");
+        assertThat(book.categories()).containsExactlyInAnyOrder("HORROR", "PUZZLE");
     }
 
     @Test
@@ -71,7 +72,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getCategories()).isEmpty();
+        assertThat(book.categories()).isEmpty();
     }
 
     @Test
@@ -129,7 +130,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getSections().get(1).options()).isEmpty();
+        assertThat(book.sections().get(1).options()).isEmpty();
     }
 
     @Test
@@ -139,7 +140,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        assertThat(book.getSections().get(1).options().get(0).consequence()).isNull();
+        assertThat(book.sections().get(1).options().get(0).consequence()).isNull();
     }
 
     @Test
@@ -150,7 +151,7 @@ class BookLoaderTest {
 
         Book book = bookLoader.fromRaw(rawBook);
 
-        Consequence consequence = book.getSections().get(1).options().get(0).consequence();
+        Consequence consequence = book.sections().get(1).options().get(0).consequence();
         assertThat(consequence.type()).isEqualTo(ConsequenceType.LOSE_HEALTH);
         assertThat(consequence.value()).isEqualTo(3);
         assertThat(consequence.text()).isEqualTo("ouch");
@@ -198,8 +199,8 @@ class BookLoaderTest {
 
         Book book = bookLoader.load(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
 
-        assertThat(book.getTitle()).isEqualTo("The Crystal Caverns");
-        Section beginSection = book.getSections().get(1);
+        assertThat(book.title()).isEqualTo("The Crystal Caverns");
+        Section beginSection = book.sections().get(1);
         assertThat(beginSection.options()).hasSize(1);
         assertThat(beginSection.options().get(0).gotoId()).isEqualTo(2);
     }

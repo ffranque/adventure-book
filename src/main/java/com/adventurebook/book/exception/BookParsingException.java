@@ -1,4 +1,4 @@
-package com.adventurebook.book.loader;
+package com.adventurebook.book.exception;
 
 public class BookParsingException extends RuntimeException {
 

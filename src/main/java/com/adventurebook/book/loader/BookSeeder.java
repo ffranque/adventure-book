@@ -2,6 +2,7 @@ package com.adventurebook.book.loader;
 
 import com.adventurebook.book.BookRepository;
 import com.adventurebook.book.domain.Book;
+import com.adventurebook.book.exception.BookParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -70,7 +71,7 @@ public class BookSeeder implements ApplicationRunner {
             }
 
             Book saved = bookRepository.save(source, book);
-            log.info("Loaded book: {} ({})", saved.getTitle(), source);
+            log.info("Loaded book: {} ({})", saved.title(), source);
             return Optional.of(saved);
         } catch (IOException e) {
             log.warn("Skipping unreadable resource {}: {}", resource.getFilename(), e.getMessage());

@@ -24,7 +24,7 @@ public class BookValidator {
     }
 
     private void checkSingleBeginning(Book book, List<String> violations) {
-        long beginCount = book.getSections().values().stream()
+        long beginCount = book.sections().values().stream()
                 .filter(s -> s.type() == SectionType.BEGIN)
                 .count();
 
@@ -34,7 +34,7 @@ public class BookValidator {
     }
 
     private void checkHasEnding(Book book, List<String> violations) {
-        boolean hasEnding = book.getSections().values().stream()
+        boolean hasEnding = book.sections().values().stream()
                 .anyMatch(s -> s.type() == SectionType.END);
 
         if (!hasEnding) {
@@ -43,9 +43,9 @@ public class BookValidator {
     }
 
     private void checkGotoIdsResolve(Book book, List<String> violations) {
-        for (Section section : book.getSections().values()) {
+        for (Section section : book.sections().values()) {
             for (Option option : section.options()) {
-                if (!book.getSections().containsKey(option.gotoId())) {
+                if (!book.sections().containsKey(option.gotoId())) {
                     violations.add("Section " + section.id() + " option \"" + option.description()
                             + "\" points to non-existent section id " + option.gotoId());
                 }
@@ -54,7 +54,7 @@ public class BookValidator {
     }
 
     private void checkNonEndingSectionsHaveOptions(Book book, List<String> violations) {
-        for (Section section : book.getSections().values()) {
+        for (Section section : book.sections().values()) {
             if (section.type() != SectionType.END && section.options().isEmpty()) {
                 violations.add("Section " + section.id() + " is type " + section.type() + " but has no options");
             }

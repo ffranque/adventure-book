@@ -45,7 +45,7 @@ class AdventureServiceTest {
 
     private void givenBook(Book book) {
         when(bookRepository.existsById("book-1")).thenReturn(true);
-        for (Section section : book.getSections().values()) {
+        for (Section section : book.sections().values()) {
             when(sectionRepository.findSection("book-1", section.id())).thenReturn(Optional.of(section));
             if (section.type() == SectionType.BEGIN) {
                 when(sectionRepository.findBeginSection("book-1")).thenReturn(Optional.of(section));
